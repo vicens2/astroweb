@@ -3,11 +3,29 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
+import node from '@astrojs/node';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	output: 'static',
+	experimental: {
+		session: true
+	},
+	output: 'server',
+	server: {
+		port: 3000,
+		host: true
+	},
+	// Configuración del adaptador de Node.js
+	adapter: node({
+		mode: 'standalone',
+		serverEntrypoint: '@astrojs/node/server.js',
+		// Deshabilitar explícitamente las sesiones
+		server: {
+			session: false
+		}
+	}),
 	vite: {
 		resolve: {
 			alias: {
