@@ -9,9 +9,9 @@ import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	experimental: {
-		session: true
-	},
+	// experimental: {
+	// 	session: true
+	// },
 	output: 'server',
 	server: {
 		port: 3000,
