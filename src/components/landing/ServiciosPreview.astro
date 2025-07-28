@@ -1,0 +1,137 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import ServicioCard from "@components/work/ServicioCard.astro";
+import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const { class: className } = Astro.props;
+
+// Services data with direct image URLs
+const services = [
+  {
+    title: "Celebraciones Familiares",
+    description: "Bodas, bautizos, comuniones y aniversarios: inmortaliza los momentos más íntimos y emotivos junto a tu familia.",
+    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    link: "/servicios/bodas"
+  },
+  {
+    title: "Eventos corporativos",
+    description: "Fiestas de empresa, lanzamientos de producto, congresos y jornadas de team building: aporta un toque profesional y dinámico a cualquier encuentro de negocios.",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    link: "/servicios/empresarial"
+  },
+  {
+    title: "Reuniones y Fiestas Sociales",
+    description: "Cumpleaños, despedidas de soltero/a, graduaciones y reuniones de amigos: diversión garantizada con recuerdos inmediatos para compartir al instante.",
+    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    link: "/servicios/eventos"
+  },
+  {
+    title: "Eventos Culturales y Comunitarios",
+    description: "Festivales, conciertos, ferias y galas benéficas: crea experiencias interactivas y memorables que conecten con el público y amplifiquen tu mensaje.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
+    link: "/servicios/sesiones"
+  }
+];
+---
+
+<section id="servicios" class:list={["section servicios-preview-section home-dark-section py-12", className]}>
+  <div class="col-span-12 col-start-1 mx-auto max-w-7xl">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4 text-black">Servicios y tipos de eventos</h2>
+      <p class="text-xl text-black max-w-2xl mx-auto">Abarcamos todo tipo de eventos. Nos adaptamos a tus necesidades para que no te tegas que preocupar de nada, solo de disfrutar de tu evento.</p>
+    </div>
+    <ol class="grid grid-cols-1 gap-24 md:grid-cols-2 lg:gap-44">
+      {
+        services.map((service, index) => (
+          <ServicioCard
+            image={service.image}
+            title={service.title}
+            description={service.description}
+            link={service.link}
+            class={
+              index % 2 === 0
+                ? `md:col-start-1 md:row-start-${Math.floor(index / 2) * 2 + 1} md:row-span-2`
+                : `md:col-start-2 md:row-start-${Math.floor(index / 2) * 2 + 2} md:row-span-2`
+            }
+          />
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style is:global>
+  .servicios-preview-section ol li img {
+    --clip: 0%;
+    clip-path: inset(var(--clip) round 0.5rem);
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function init() {
+    const services = gsap.utils.toArray(".servicios-preview-section ol li") as gsap.DOMTarget[];
+    const previews = gsap.utils.toArray(".servicios-preview-section ol li img") as gsap.DOMTarget[];
+    
+    // Image reveal animation - exactly like WorkPreview
+    previews.forEach((preview) => {
+      gsap.from(preview, {
+        scrollTrigger: {
+          trigger: preview,
+          start: "top bottom",
+          end: "center center",
+          scrub: 1,
+          markers: false,
+        },
+        ease: "power3.out",
+        "--clip": "30%",
+      });
+    });
+
+    // Dark section background animation - exactly like WorkPreview
+    gsap.to(".home-dark-section", {
+      scrollTrigger: {
+        trigger: ".servicios-preview-section",
+        start: "bottom bottom",
+        end: "bottom 70%",
+        scrub: 0.5,
+        markers: false,
+        immediateRender: false,
+      },
+      ease: "none",
+      backgroundColor: "#18181b",
+      color: "#fff",
+    });
+
+    // Parallax effect for service cards on desktop - exactly like WorkPreview
+    if (window.innerWidth >= 768) {
+      services.forEach((service) => {
+        gsap.to(service, {
+          scrollTrigger: {
+            trigger: ".servicios-preview-section ol",
+            start: "top bottom",
+            end: "bottom center",
+            scrub: 1,
+            markers: false,
+          },
+          ease: "none",
+          y: `-200px`,
+        });
+      });
+    }
+  }
+
+  // Handle page load and navigation - exactly like WorkPreview
+  document.removeEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("astro:page-load", init);
+</script>

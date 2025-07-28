@@ -1,0 +1,672 @@
+---
+import { getLangFromUrl, useTranslations } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const catalogItems = [
+  {
+    id: 'fotomatones',
+    title: t("catalog.items.photobooth.title"),
+    description: t("catalog.items.photobooth.description"),
+    image: "https://images.unsplash.com/photo-1527525443983-6e60c75fff46?w=800&auto=format&fit=crop",
+    price: "Desde 299"
+  },
+  {
+    id: 'plataformas360',
+    title: t("catalog.items.platform360.title"),
+    description: t("catalog.items.platform360.description"),
+    image: "https://images.unsplash.com/photo-1519225421980-715cb0215a4c?w=800&auto=format&fit=crop",
+    price: "Desde 499"
+  },
+  {
+    id: 'video',
+    title: t("catalog.items.video.title"),
+    description: t("catalog.items.video.description"),
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&auto=format&fit=crop",
+    price: "Desde 799"
+  },
+  {
+    id: 'photography',
+    title: t("catalog.items.photography.title"),
+    description: t("catalog.items.photography.description"),
+    image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&auto=format&fit=crop",
+    price: "Desde 599"
+  }
+];
+---
+
+<section id="catalog" class="relative py-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white lg:py-28">
+  <!-- Background pattern -->
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute inset-0 bg-[url('/images/patterns/grid.svg')] bg-[length:40px_40px] opacity-10"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-white/80 via-transparent to-white/80"></div>
+  </div>
+  
+  <!-- Decorative elements -->
+  <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+  <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+
+  <div class="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="max-w-3xl mx-auto text-center mb-16">
+      <h2 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+        <span class="block">{t("catalog.title")}</span>
+      </h2>
+      <p class="max-w-2xl mx-auto mt-4 text-xl text-gray-600">
+        {t("catalog.subtitle")}
+      </p>
+      <div class="w-24 h-1 mx-auto mt-6 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+    </div>
+
+    <!-- Catalog grid -->
+    <div class="grid max-w-6xl grid-cols-1 gap-8 mx-auto mt-12 sm:grid-cols-2 lg:grid-cols-2 lg:gap-12">
+      {catalogItems.map((item, index) => (
+        <div 
+          class="group relative flex flex-col h-full overflow-hidden transition-all duration-300 bg-white border border-gray-200 rounded-2xl hover:shadow-xl hover:-translate-y-1"
+          data-cursor-hover 
+          data-cursor-parallax
+        >
+          {/* Image container */}
+          <div class="relative h-64 overflow-hidden">
+            <img 
+              src={item.image} 
+              alt={item.title}
+              class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
+            />
+            {/* Price badge */}
+            <div class="absolute top-4 right-4">
+              <span class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg">
+                {item.price}€
+              </span>
+            </div>
+          </div>
+          
+          {/* Content */}
+          <div class="flex flex-col flex-1 p-6">
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold text-gray-900">{item.title}</h3>
+              <div class="w-12 h-1 my-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+              <p class="mt-2 text-gray-600">{item.description}</p>
+            </div>
+            
+            <div class="mt-6">
+              <a 
+                href={`/catalog?category=${item.id}`}
+                class="inline-flex items-center text-sm font-medium text-blue-600 transition-colors group-hover:text-blue-800"
+              >
+                Accede al catálogo
+                <svg 
+                  class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2" 
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    {/* CTA at the bottom */}
+    <div class="mt-16 text-center">
+      <a 
+        href="/catalog" 
+        class="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white transition-all bg-blue-600 border border-transparent rounded-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        Ver catálogo completo
+        <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Cargar GSAP desde CDN -->
+<script>
+  // Función para crear partículas
+  function createParticles(container: HTMLElement) {
+    const particleCount = 30;
+    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'];
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      const size = Math.random() * 6 + 2;
+      const posX = Math.random() * 100;
+      const posY = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = 15 + Math.random() * 20;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      particle.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${color};
+        border-radius: 50%;
+        opacity: ${Math.random() * 0.3 + 0.1};
+        left: ${posX}%;
+        top: ${posY}%;
+        pointer-events: none;
+      `;
+      
+      container.appendChild(particle);
+      
+      // Animar partícula
+      if (typeof gsap !== 'undefined') {
+        gsap.to(particle, {
+          x: (Math.random() - 0.5) * 200,
+          y: (Math.random() - 0.5) * 200,
+          duration: duration,
+          delay: delay,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      }
+    }
+  }
+
+  // Función para inicializar animaciones
+  function initCatalogAnimations() {
+    console.log('Inicializando animaciones del catálogo...');
+    
+    // Inicializar partículas
+    const particlesContainer = document.getElementById('particles');
+    if (particlesContainer) {
+      createParticles(particlesContainer);
+    }
+    
+    // Animación del fondo - Versión mínima
+    const overlay = document.getElementById('bg-overlay');
+    const section = document.querySelector('#catalog');
+    
+    if (overlay && section) {
+      // Verificar que los elementos existen
+      console.log('Elementos encontrados:', { overlay, section });
+      
+      // Forzar un color de fondo inicial
+      overlay.style.backgroundColor = '#000000';
+      
+      // Usar el evento de scroll más simple posible
+      function checkScroll() {
+        const rect = section.getBoundingClientRect();
+        const isInView = (
+          rect.top <= window.innerHeight && 
+          rect.bottom >= 0
+        );
+        
+        console.log('Posición:', rect.top, 'Pantalla:', window.innerHeight, 'Visible:', isInView);
+        
+        overlay.style.opacity = isInView ? '1' : '0';
+      }
+      
+      // Añadir evento de scroll
+      window.addEventListener('scroll', checkScroll);
+      
+      // Verificar estado inicial
+      checkScroll();
+    } else {
+      console.error('No se encontraron los elementos necesarios');
+    }
+    
+    // Verificar si GSAP está disponible
+    if (typeof gsap === 'undefined') {
+      console.warn('GSAP no está disponible. Las animaciones no funcionarán.');
+      return;
+    }
+
+    // Registrar ScrollTrigger si está disponible
+    if (gsap.registerPlugin && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      console.log('ScrollTrigger registrado correctamente');
+    } else {
+      console.warn('ScrollTrigger no está disponible');
+    }
+
+    // Animaciones de fondo
+    const bgPattern = document.getElementById('bg-pattern');
+    const gradient1 = document.getElementById('gradient-1');
+    const gradient2 = document.getElementById('gradient-2');
+    
+    if (bgPattern && gradient1 && gradient2) {
+      // Crear timeline para las animaciones de fondo
+      const bgTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#catalog',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 0.5,
+          onUpdate: (self: { progress: number }) => {
+            const progress = self.progress;
+            const scrollY = window.scrollY;
+            
+            // Mover gradientes en direcciones opuestas
+            if (gradient1) {
+              gsap.to(gradient1, {
+                x: Math.sin(progress * Math.PI) * 100,
+                y: progress * 50,
+                duration: 0.1,
+                overwrite: 'auto'
+              });
+            }
+            
+            if (gradient2) {
+              gsap.to(gradient2, {
+                x: -Math.sin(progress * Math.PI) * 80,
+                y: -progress * 40,
+                duration: 0.1,
+                overwrite: 'auto'
+              });
+            }
+            
+            // Efecto de paralaje sutil en el patrón de fondo
+            if (bgPattern) {
+              const moveX = scrollY * 0.1;
+              const moveY = scrollY * 0.05;
+              bgPattern.style.backgroundPosition = `${moveX}px ${moveY}px`;
+            }
+          }
+        }
+      });
+      
+      // Animación suave de opacidad al aparecer
+      bgTimeline.fromTo(
+        [gradient1, gradient2],
+        { opacity: 0 },
+        { opacity: 1, duration: 1.5, ease: 'power2.out' },
+        0
+      );
+    }
+    
+    // Animación de la línea decorativa
+    const line = document.getElementById('catalog-line');
+    if (line) {
+      gsap.to(line, {
+        width: '100px',
+        opacity: 1,
+        duration: 1,
+        scrollTrigger: {
+          trigger: line,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+          onEnter: () => console.log('Línea animada')
+        }
+      });
+    } else {
+      console.warn('No se encontró el elemento de la línea');
+    }
+
+    // Animación del título
+    const title = document.getElementById('catalog-title');
+    const subtitle = document.getElementById('catalog-subtitle');
+    const fullCatalogBtn = document.getElementById('full-catalog-btn');
+    
+    if (title && subtitle && fullCatalogBtn) {
+      // Animación en cadena para título, subtítulo y botón
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: title,
+          start: 'top 90%',
+          toggleActions: 'play none none none'
+        }
+      })
+      .to(title, {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      })
+      .to(subtitle, {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      }, '-=0.4')
+      .to(fullCatalogBtn, {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      }, '-=0.6');
+    } else {
+      console.warn('No se encontraron elementos del encabezado');
+    }
+
+    // La animación del subtítulo ahora está incluida en la línea de tiempo de animación del título
+
+    // Animación de las tarjetas
+    const cards = document.querySelectorAll('.catalog-card');
+    if (cards.length > 0) {
+      cards.forEach((card, index) => {
+        gsap.to(card, {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          delay: index * 0.1,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 90%',
+            toggleActions: 'play none none none',
+            onEnter: () => console.log(`Tarjeta ${index + 1} animada`)
+          }
+        });
+      });
+    } else {
+      console.warn('No se encontraron tarjetas');
+    }
+  }
+
+  // Cargar GSAP si no está disponible
+  if (typeof gsap === 'undefined') {
+    console.log('Cargando GSAP desde CDN...');
+    const gsapScript = document.createElement('script');
+    gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+    gsapScript.onload = () => {
+      console.log('GSAP cargado, cargando ScrollTrigger...');
+      const scrollTriggerScript = document.createElement('script');
+      scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+      scrollTriggerScript.onload = () => {
+        console.log('ScrollTrigger cargado, inicializando animaciones...');
+        initCatalogAnimations();
+      };
+      document.head.appendChild(scrollTriggerScript);
+    };
+    document.head.appendChild(gsapScript);
+  } else {
+    console.log('GSAP ya está cargado, inicializando animaciones...');
+    // Si GSAP ya está cargado, inicializar animaciones
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCatalogAnimations);
+    } else {
+      // Pequeño retraso para asegurar que todo esté listo
+      setTimeout(initCatalogAnimations, 500);
+    }
+  }
+
+  // También intentar inicializar cuando Astro cargue la página
+  document.addEventListener('astro:page-load', () => {
+    console.log('Evento astro:page-load detectado, inicializando animaciones...');
+    setTimeout(initCatalogAnimations, 100);
+  });
+</script>
+
+<style>
+  /* Animations */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Card hover effect */
+  .catalog-card {
+    transition: all 0.3s ease;
+  }
+
+  .catalog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Background pattern */
+  .bg-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40h-40v-40z m36 36v-32h-32v32h32z' fill='%23e5e7eb' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+  }
+  /* Texto oscuro para mejor contraste */
+  .catalog-card h3 {
+    @apply text-white;
+  }
+  
+  .catalog-card p {
+    @apply text-gray-200;
+  }
+  
+  .catalog-card .price {
+    @apply text-white;
+  }
+  
+  /* Efectos de hover y transiciones */
+  .catalog-card {
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: #000;
+    opacity: 0;
+    animation: cardEntry 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  
+  /* Efecto de elevación al hacer hover */
+  .catalog-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .catalog-card:hover::after {
+    opacity: 1;
+  }
+  
+  /* Animación de entrada de las tarjetas */
+  @keyframes cardEntry {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Aplicar retraso según el índice */
+  .catalog-card:nth-child(1) { animation-delay: 0.1s; }
+  .catalog-card:nth-child(2) { animation-delay: 0.2s; }
+  .catalog-card:nth-child(3) { animation-delay: 0.3s; }
+  .catalog-card:nth-child(4) { animation-delay: 0.4s; }
+  
+  /* Estilos para el botón */
+  .catalog-card button {
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+  }
+  
+  .catalog-card button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    z-index: -1;
+  }
+  
+  .catalog-card button:hover::before {
+    transform: translateX(100%);
+  }
+  
+  /* Efecto de brillo al seguir el cursor */
+  .catalog-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      600px circle at var(--x, 100px) var(--y, 100px),
+      rgba(255, 255, 255, 0.1),
+      transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .catalog-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    --tw-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 10px 10px -5px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+
+  .catalog-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Efecto de brillo en el borde */
+  .catalog-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    padding: 1px;
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.5), rgba(168, 85, 247, 0.5));
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .catalog-card:hover::after {
+    opacity: 1;
+  }
+
+  /* Efecto de zoom en la imagen */
+  .catalog-card img {
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transform-origin: center;
+  }
+
+  .catalog-card:hover img {
+    transform: scale(1.1);
+  }
+
+  /* Efecto de elevación en el contenido */
+  .catalog-card .content {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .catalog-card:hover .content {
+    transform: translateY(-5px);
+  }
+
+  /* Transición suave para el texto */
+  .catalog-card h3,
+  .catalog-card p {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .catalog-card:hover h3 {
+    transform: translateY(-3px);
+  }
+
+  .catalog-card:hover p {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+
+  /* Efecto de botón */
+  .catalog-card .btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .catalog-card .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #3b82f6, #a855f7);
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .catalog-card:hover .btn::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Estilos para el efecto de hover en las tarjetas */
+  article {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  article:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Animación de entrada para móviles */
+  @media (max-width: 768px) {
+    .catalog-card {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+</style>

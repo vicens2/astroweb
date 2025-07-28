@@ -1,0 +1,564 @@
+---
+// CheckoutForm component will be added back after debugging
+---
+
+<!-- Debug message -->
+<div id="cart-debug" style="position: fixed; top: 10px; right: 10px; background: #4CAF50; color: white; padding: 10px; border-radius: 5px; z-index: 9999; display: none;">
+  Initializing cart...
+</div>
+
+<script>
+  // Define customization interface for album items
+  interface AlbumCustomization {
+    color: string;
+    text: string;
+    date: string;
+  }
+
+  // Define cart item interface
+  interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+    hours?: number; // For time-based rentals
+    category?: string; // For categorizing items
+    quantity: number; // Always 1 for single quantity items
+    customization?: AlbumCustomization; // For album customization
+  }
+
+  // Define cart interface
+  interface Cart {
+    items: CartItem[];
+    isOpen: boolean;
+    init: () => void;
+    loadFromStorage: () => void;
+    saveToStorage: () => void;
+    updateUI: () => void;
+    addItem: (item: Omit<CartItem, 'quantity'>) => boolean;
+    removeItem: (index: number) => void;
+    toggleCart: (show?: boolean) => void;
+    setupEventListeners: () => void;
+    getCart: () => CartItem[];
+    addTestItem: () => void; // Add test item method
+    // Event handlers (kept for backward compatibility)
+    handleCartButtonClick?: (e: MouseEvent) => void;
+    handleCloseButtonClick?: (e: MouseEvent) => void;
+    handleOverlayClick?: () => void;
+    handleDocumentClick?: (e: MouseEvent) => void;
+  }
+
+  // Extend Window interface
+  declare global {
+    interface Window {
+      cart: Cart;
+      cartInitialized?: boolean;
+    }
+  }
+
+  // Función para obtener el valor del color en formato CSS
+  function getColorValue(colorName: string | undefined): string {
+    if (!colorName) return '#000000';
+    
+    const colors: {[key: string]: string} = {
+      'rojo': '#EF4444',
+      'azul': '#3B82F6',
+      'verde': '#10B981',
+      'amarillo': '#F59E0B',
+      'negro': '#000000',
+      'blanco': '#FFFFFF'
+    };
+    
+    return colors[colorName.toLowerCase()] || '#000000';
+  }
+
+  // Cart implementation
+  const createCart = (): Cart => {
+    // Private variables
+    let eventListenersInitialized = false;
+    
+    const cart: Cart = {
+      items: [],
+      isOpen: false,
+
+      init() {
+        try {
+          this.loadFromStorage();
+          this.setupEventListeners();
+          this.updateUI();
+        } catch (error) {
+          console.error('Error initializing cart:', error);
+        }
+      },
+
+      loadFromStorage() {
+        try {
+          if (typeof window !== 'undefined') {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+              const parsed = JSON.parse(savedCart);
+              if (Array.isArray(parsed)) {
+                this.items = parsed.map((item: any) => ({
+                  ...item,
+                  price: Number(item.price) || 0,
+                  quantity: Number(item.quantity) || 1
+                }));
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error loading cart from storage:', error);
+          this.items = [];
+        }
+      },
+
+      saveToStorage() {
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cart', JSON.stringify(this.items));
+          }
+        } catch (error) {
+          console.error('Error saving cart to storage:', error);
+        }
+      },
+
+      updateUI() {
+        const cartItems = this.getCart();
+        const cartCount = document.getElementById('cart-count');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+
+        if (cartCount) {
+          const itemCount = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+          cartCount.textContent = itemCount.toString();
+          cartCount.classList.toggle('hidden', itemCount === 0);
+        }
+
+        if (cartItemsContainer) {
+          if (cartItems.length === 0) {
+            cartItemsContainer.innerHTML = `
+              <div class="py-8 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Tu carrito está vacío</h3>
+                <p class="mt-1 text-sm text-gray-500">Empieza a agregar productos a tu carrito</p>
+              </div>
+            `;
+          } else {
+            cartItemsContainer.innerHTML = cartItems.map((item, index) => `
+              <div class="flex items-center py-4 border-b border-gray-200">
+                <div class="flex-shrink-0">
+                  <img src="${item.image || '/placeholder-product.jpg'}" alt="${item.name}" class="w-20 h-20 rounded-md object-cover object-center">
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between text-base font-medium text-gray-900">
+                    <h3>${item.name}</h3>
+                    <p class="ml-4">${(item.price * item.quantity).toFixed(2)}€</p>
+                  </div>
+                  ${item.hours && !item.name.includes('Álbum Fotográfico Premium') && item.category !== 'fotomaton' && item.category !== 'plataforma' ? `
+                    <div class="mt-1 text-sm text-gray-500">
+                      <span>${item.hours} hora${item.hours !== 1 ? 's' : ''}</span>
+                    </div>
+                  ` : ''}
+                  
+                  <!-- Mostrar detalles de personalización para álbumes -->
+                  ${item.customization ? `
+                    <div class="mt-2 text-sm">
+                      <div class="flex items-center">
+                        <span class="text-gray-600">Color:</span>
+                        <div class="flex items-center ml-2">
+                          <span class="inline-block w-4 h-4 rounded-full border border-gray-300 mr-1" style="background-color: ${getColorValue(item.customization.color)};"></span>
+                          <span class="text-gray-800">${item.customization.color ? `(${item.customization.color.charAt(0).toUpperCase() + item.customization.color.slice(1)})` : '(No especificado)'}</span>
+                        </div>
+                      </div>
+                      ${item.customization.text ? `
+                        <div class="text-gray-600">
+                          <span class="font-medium">Texto:</span> ${item.customization.text}
+                        </div>
+                      ` : ''}
+                      ${item.customization.date ? `
+                        <div class="text-gray-600">
+                          <span class="font-medium">Fecha:</span> ${new Date(item.customization.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </div>
+                      ` : ''}
+                    </div>
+                  ` : ''}
+                  
+                  <div class="flex items-center justify-between mt-2">
+                    <button type="button" class="text-red-500 hover:text-red-700 flex items-center text-sm" data-index="${index}" data-action="remove">
+                      <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Eliminar
+                    </button>
+                  </div>
+                  <p class="mt-1 text-sm text-gray-500">${item.price.toFixed(2)}€ c/u</p>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+
+        // Calculate total (prices already include VAT)
+        const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const totalHours = cartItems.reduce((sum, item) => sum + (item.hours || 0), 0);
+
+        // Update UI
+        if (cartTotal) cartTotal.textContent = total.toFixed(2) + '€';
+        
+        // Add or update hours total display
+        let hoursTotalElement = document.getElementById('cart-hours-total');
+        if (totalHours > 0) {
+          if (!hoursTotalElement) {
+            const subtotalElement = document.querySelector('.subtotal-row');
+            if (subtotalElement) {
+              const hoursRow = document.createElement('div');
+              hoursRow.className = 'subtotal-row flex justify-between text-sm text-gray-600 py-1';
+              hoursRow.id = 'cart-hours-total';
+              hoursRow.innerHTML = `
+                <span>Total horas:</span>
+                <span>${totalHours} hora${totalHours !== 1 ? 's' : ''}</span>
+              `;
+              subtotalElement.parentNode?.insertBefore(hoursRow, subtotalElement);
+            }
+          } else {
+            hoursTotalElement.innerHTML = `
+              <span>Total horas:</span>
+              <span>${totalHours} hora${totalHours !== 1 ? 's' : ''}</span>
+            `;
+          }
+        } else if (hoursTotalElement) {
+          hoursTotalElement.remove();
+        }
+      },
+
+      addItem(item: Omit<CartItem, 'quantity'>): boolean {
+        const existingItemIndex = this.items.findIndex(i => i.id === item.id);
+        
+        if (existingItemIndex >= 0) {
+          // Item already in cart, just return false without showing a message
+          return false;
+        }
+        
+        // Create new cart item with required quantity
+        const newItem: CartItem = {
+          ...item,
+          quantity: 1 // Ensure quantity is always 1
+        };
+        
+        this.items.push(newItem);
+        this.saveToStorage();
+        this.updateUI();
+        
+        return true;
+      },
+
+      removeItem(index: number) {
+        if (this.items[index]) {
+          this.items.splice(index, 1);
+          this.saveToStorage();
+          this.updateUI();
+        }
+      },
+
+      toggleCart(show?: boolean) {
+        const cartPanel = document.getElementById('cart-panel');
+        const overlay = document.getElementById('cart-overlay');
+        const cartContent = document.getElementById('cart-content');
+
+        if (!cartPanel || !overlay || !cartContent) return;
+
+        if (show === undefined) {
+          this.isOpen = !this.isOpen;
+        } else {
+          this.isOpen = show;
+        }
+
+        if (this.isOpen) {
+          document.body.style.overflow = 'hidden';
+          cartPanel.classList.remove('hidden');
+          setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            cartContent.classList.remove('translate-x-full');
+          }, 10);
+          this.updateUI();
+        } else {
+          document.body.style.overflow = '';
+          overlay.classList.add('opacity-0');
+          cartContent.classList.add('translate-x-full');
+          setTimeout(() => {
+            cartPanel.classList.add('hidden');
+          }, 300);
+        }
+      },
+
+      setupEventListeners() {
+        // Only set up event listeners once
+        if (eventListenersInitialized) return;
+        
+        // Toggle cart
+        const cartButton = document.getElementById('cart-button');
+        if (cartButton) {
+          cartButton.addEventListener('click', (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleCart();
+          });
+        }
+
+        // Close button
+        const closeButton = document.getElementById('close-cart');
+        if (closeButton) {
+          closeButton.addEventListener('click', (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleCart(false);
+          });
+        }
+
+        // Overlay
+        const overlay = document.getElementById('cart-overlay');
+        if (overlay) {
+          overlay.addEventListener('click', () => this.toggleCart(false));
+        }
+
+        // Handle remove button clicks
+        document.addEventListener('click', (e: Event) => {
+          const target = e.target as HTMLElement;
+          const button = target.closest('[data-action="remove"]');
+          
+          if (!button) return;
+          
+          const index = parseInt(button.getAttribute('data-index') || '0', 10);
+          this.removeItem(index);
+        });
+        
+        eventListenersInitialized = true;
+      },
+      
+          // Get current cart items
+      getCart(): CartItem[] {
+        return [...this.items];
+      },
+      
+      // For development/testing
+      addTestItem() {
+        this.addItem({
+          id: 'test-item-' + Date.now(),
+          name: 'Producto de prueba',
+          price: 9.99,
+          image: '/placeholder-product.jpg',
+          hours: 1,
+          category: 'test'
+        });
+      }
+    };
+    
+    return cart;
+  };
+
+  // Show notification function
+  const showNotification = (message: string) => {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 px-4 py-2 rounded-md text-white bg-red-500 shadow-lg z-50 transition-opacity duration-300 opacity-0';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Trigger reflow
+    void notification.offsetWidth;
+    
+    // Show notification
+    notification.classList.remove('opacity-0');
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+      notification.classList.add('opacity-0');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  };
+
+  // Create and initialize cart
+  const cart = createCart();
+  
+  // Assign to window if in browser
+  if (typeof window !== 'undefined') {
+    // Only assign to window if not already assigned to prevent re-initialization
+    if (!window.cart) {
+      window.cart = cart;
+      window.showNotification = showNotification; // Make it available globally
+      
+      // Simple initialization function
+      const initializeCart = () => {
+        try {
+          // Skip if already initialized
+          if (window.cartInitialized) return;
+          window.cartInitialized = true;
+          
+          // Initialize cart
+          cart.init();
+          
+          // Debug message removed
+        } catch (error) {
+          console.error('Error initializing cart:', error);
+          const debugEl = document.getElementById('cart-debug');
+          if (debugEl) {
+            debugEl.textContent = 'Error initializing cart';
+            debugEl.style.backgroundColor = 'red';
+            debugEl.style.display = 'block';
+          }
+        }
+      };
+      
+      // Initialize cart when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCart);
+      } else {
+        // Small delay to ensure all elements are in the DOM
+        setTimeout(initializeCart, 100);
+      }
+    }
+  }
+</script>
+
+<!-- Botón del carrito -->
+<div class="fixed bottom-4 right-4 z-50">
+  <button
+    id="cart-button"
+    class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600 dark:ring-offset-gray-900"
+    aria-label="Abrir carrito"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+      />
+    </svg>
+    <span
+      id="cart-count"
+      class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white"
+      style="display: none"
+    ></span>
+  </button>
+  
+  <!-- Panel del carrito -->
+  <div
+  id="cart-panel"
+  class="fixed inset-0 z-50 hidden h-full w-full overflow-hidden"
+  aria-labelledby="cart-title"
+  role="dialog"
+  aria-modal="true"
+>
+  <!-- Overlay -->
+  <div
+    id="cart-overlay"
+    class="fixed inset-0 bg-black bg-opacity-50 transition-opacity dark:bg-opacity-70"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Cart panel -->
+  <div
+    id="cart-content"
+    class="fixed inset-y-0 right-0 flex w-full max-w-md transform flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out dark:bg-gray-800 sm:translate-x-0"
+  >
+    <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+      <div class="flex items-start justify-between">
+        <h2
+          id="cart-title"
+          class="text-lg font-medium text-gray-900 dark:text-white"
+        >
+          Carrito de compra
+        </h2>
+        <button
+          id="close-cart"
+          type="button"
+          class="-m-2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+        >
+          <span class="sr-only">Cerrar carrito</span>
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mt-8">
+        <div class="flow-root">
+          <ul id="cart-items" class="-my-6 divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Cart items will be inserted here by JavaScript -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-200 py-6 px-4 sm:px-6">
+      <div id="cart-summary" class="space-y-2">
+        <div class="total-row flex justify-between text-base font-medium text-gray-900">
+          <p>Total</p>
+          <p id="cart-total">0.00€</p>
+        </div>
+      </div>
+    </div>
+      <div class="mt-6">
+        <button
+          onclick="openCheckoutForm()"
+          id="checkout-button"
+          class="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          Solicitar selección
+        </button>
+      </div>
+      <div class="mt-6 flex justify-center text-center text-sm text-gray-500 dark:text-gray-400">
+        <p>
+          o
+          <button
+            type="button"
+            id="continue-shopping"
+            class="ml-1 font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Continuar comprando
+            <span aria-hidden="true"> &rarr;</span>
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Estilos -->
+<style is:global>
+  #cart-panel {
+    transition: opacity 0.3s ease;
+  }
+  
+  #cart-count {
+    display: none;
+  }
+  
+  #cart-count:not(:empty) {
+    display: flex;
+  }
+
+  .show-cart {
+    transform: translateX(0) !important;
+  }
+</style>
+
+<!-- CheckoutForm component will be added back after debugging -->

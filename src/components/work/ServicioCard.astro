@@ -1,0 +1,98 @@
+---
+import { Image } from "astro:assets";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const { image, title, description, link, class: className } = Astro.props;
+---
+
+<li class:list={["flex flex-col", className]}>
+  <a href={translatePath(link)} class="group block overflow-hidden" aria-label={`Servicio ${title}`}>
+    <div class="relative h-[25rem] overflow-hidden rounded-md lg:rounded-lg">
+      <img 
+        src={image}
+        alt={title}
+        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        width={800}
+        height={600}
+        loading="lazy"
+      />
+      <div class="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+    </div>
+  </a>
+  <div class="px-2 py-8">
+    <a href={translatePath(link)} class="flex items-center justify-between text-base font-medium lg:gap-x-8 group-hover:text-primary-600 transition-colors">
+      <h3 class="font-mono text-lg font-medium uppercase tracking-wide md:mt-0 lg:text-xl">
+        {title}
+      </h3>
+      <span class="text-right text-base text-slate-500 group-hover:text-primary-600 transition-colors">
+        <span class="hidden lg:inline-block">Ver más</span>
+        <span class="sr-only">{title}</span> &nbsp; &rarr;
+      </span>
+    </a>
+    {description && <p class="mt-4 line-clamp-2 text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+  </div>
+</li>
+
+<style is:global>
+  .servicios-preview-section ol li img {
+    --clip: 0%;
+    clip-path: inset(var(--clip) round 0.5rem);
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .servicios-preview-section ol li {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    
+    .servicios-preview-section ol li.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script>
+  // Intersection Observer para animar los elementos al hacer scroll
+  function initAnimations() {
+    const serviceItems = document.querySelectorAll('.servicios-preview-section ol li');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    serviceItems.forEach(item => {
+      observer.observe(item);
+    });
+    
+    // Forzar la animación del primer elemento si está en el viewport
+    if (serviceItems[0]) {
+      const firstItemRect = serviceItems[0].getBoundingClientRect();
+      if (firstItemRect.top < window.innerHeight && firstItemRect.bottom > 0) {
+        serviceItems[0].classList.add('is-visible');
+      }
+    }
+  }
+
+  // Inicializar animaciones cuando el documento esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnimations);
+  } else {
+    initAnimations();
+  }
+  
+  // Manejar la navegación de Astro
+  document.addEventListener('astro:page-load', initAnimations);
+</script>

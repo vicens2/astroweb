@@ -1,0 +1,249 @@
+// @ts-nocheck
+// Comentado temporalmente para permitir build estático
+/*
+import type { APIRoute } from 'astro';
+import { Resend } from 'resend';
+
+export const prerender = false;
+
+const resend = new Resend(import.meta.env.PUBLIC_RESEND_API_KEY);
+
+// This function handles the checkout form submission
+export const POST: APIRoute = async ({ request }) => {
+  console.log('POST /api/checkout received');
+  
+  try {
+    console.log('Starting to process checkout request');
+    
+    // Log request details for debugging
+    console.log('Request URL:', request.url);
+    console.log('Request method:', request.method);
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+    
+    // Check content type
+    const contentType = request.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const errorMsg = `Invalid content type: ${contentType}`;
+      console.error(errorMsg);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Content-Type must be application/json' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    // Parse request body
+    let data;
+    try {
+      data = await request.json();
+      console.log('Request body parsed successfully:', JSON.stringify(data, null, 2));
+    } catch (parseError) {
+      const errorMsg = `Error parsing request body: ${parseError.message}`;
+      console.error(errorMsg);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Validate required fields
+    const requiredFields = ['name', 'email', 'phone', 'eventDate', 'timeSlot', 'startTime', 'location'];
+    const missingFields = requiredFields.filter(field => !data[field]);
+    
+    if (missingFields.length > 0) {
+      return new Response(
+        JSON.stringify({ 
+          error: `Faltan campos obligatorios: ${missingFields.join(', ')}` 
+        }), 
+        { status: 400 }
+      );
+    }
+
+    // Define types for cart items
+    interface CartItem {
+      name: string;
+      price: string | number;
+      customization?: {
+        color?: string;
+        text?: string;
+        date?: string;
+      };
+    }
+
+    // Format cart items for email
+    const cartItemsHtml = (data.cart as CartItem[]).map((item: CartItem) => {
+      // Ensure price is a string for the template
+      const price = String(item.price);
+      
+      let itemDetails = `
+        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+          <h3 style="margin: 0 0 5px 0; color: #1a365d;">${item.name}</h3>
+          <p style="margin: 5px 0; color: #4a5568;">Precio: ${price}€</p>
+      `;
+      
+      // Add customization details if they exist
+      if (item.customization) {
+        itemDetails += `
+          <div style="margin-top: 10px; padding-left: 10px; border-left: 3px solid #4299e1;">
+            <p style="margin: 5px 0; color: #4a5568;"><strong>Personalización:</strong></p>
+        `;
+        
+        if (item.customization.color) {
+          itemDetails += `<p style="margin: 5px 0; color: #4a5568;">Color: ${item.customization.color}</p>`;
+        }
+        
+        if (item.customization.text) {
+          itemDetails += `<p style="margin: 5px 0; color: #4a5568;">Texto: ${item.customization.text}</p>`;
+        }
+        
+        if (item.customization.date) {
+          itemDetails += `<p style="margin: 5px 0; color: #4a5568;">Fecha: ${item.customization.date}</p>`;
+        }
+        
+        itemDetails += `</div>`;
+      }
+      
+      itemDetails += `</div>`;
+      return itemDetails;
+    }).join('');
+
+    // Calculate total price
+    const totalPrice = (data.cart as CartItem[]).reduce((sum: number, item: CartItem) => {
+      return sum + (parseFloat(item.price) || 0);
+    }, 0);
+
+    // Format date for display
+    const formattedDate = new Date(data.eventDate).toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Log environment variables for debugging
+    console.log('Resend API Key:', import.meta.env.PUBLIC_RESEND_API_KEY ? '***' : 'NOT FOUND');
+    console.log('Contact Email:', import.meta.env.PUBLIC_CONTACT_EMAIL || 'NOT FOUND');
+    
+    // Calculate total hours for each service type
+    const serviceHours: Record<string, number> = {};
+    (data.cart as CartItem[]).forEach((item: CartItem) => {
+      if (item.name.toLowerCase().includes('fotomatón') || item.name.toLowerCase().includes('fotomaton')) {
+        serviceHours['fotomatones'] = (serviceHours['fotomatones'] || 0) + (parseInt(item.hours) || 0);
+      } else if (item.name.toLowerCase().includes('360') || item.name.toLowerCase().includes('plataforma')) {
+        serviceHours['plataformas360'] = (serviceHours['plataformas360'] || 0) + (parseInt(item.hours) || 0);
+      }
+    });
+
+    // Construct email content
+    const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a202c;">
+          <h1 style="color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Nueva solicitud de presupuesto</h1>
+          
+          <h2 style="color: #2d3748; margin-top: 25px; margin-bottom: 15px;">Información del contacto</h2>
+          <p><strong>Nombre:</strong> ${data.name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Teléfono:</strong> ${data.phone}</p>
+          
+          <h2 style="color: #2d3748; margin-top: 25px; margin-bottom: 15px;">Detalles del evento</h2>
+          <p><strong>Fecha del evento:</strong> ${formattedDate} (${data.timeSlot})</p>
+          <p><strong>Hora de inicio:</strong> ${data.startTime}</p>
+          <p><strong>Lugar del evento:</strong> ${data.location}</p>
+          
+          ${serviceHours['fotomatones'] ? `<p><strong>Horas de fotomatón:</strong> ${serviceHours['fotomatones']} horas</p>` : ''}
+          ${serviceHours['plataformas360'] ? `<p><strong>Horas de plataforma 360°:</strong> ${serviceHours['plataformas360']} horas</p>` : ''}
+          
+          ${data.notes ? `<p><strong>Notas adicionales:</strong> ${data.notes}</p>` : ''}
+          
+          <h2 style="color: #2d3748; margin-top: 25px; margin-bottom: 15px;">Resumen del pedido</h2>
+          ${cartItemsHtml}
+          
+          <div style="margin-top: 20px; padding: 15px; background-color: #f8fafc; border-radius: 4px; border-left: 4px solid #4299e1;">
+            <h3 style="margin: 0 0 10px 0; color: #2d3748;">Resumen de personalizaciones</h3>
+            ${(data.cart as CartItem[]).some(item => item.customization) ? 
+              (data.cart as CartItem[])
+                .filter(item => item.customization)
+                .map(item => `
+                  <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <strong>${item.name}:</strong><br>
+                    ${item.customization?.color ? `<span style="display: inline-block; width: 15px; height: 15px; background-color: ${item.customization.color}; border: 1px solid #ddd; margin-right: 5px; vertical-align: middle;"></span> ${item.customization.color}<br>` : ''}
+                    ${item.customization?.text ? `<strong>Texto:</strong> ${item.customization.text}<br>` : ''}
+                    ${item.customization?.date ? `<strong>Fecha para el álbum:</strong> ${item.customization.date}` : ''}
+                  </div>
+                `).join('')
+              : '<p>No se han especificado personalizaciones adicionales.</p>'
+            }
+          </div>
+          
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e2e8f0; font-weight: bold; font-size: 1.1em; text-align: right;">
+            Total: ${totalPrice.toFixed(2)}€
+          </div>
+          
+          <p style="margin-top: 30px; color: #718096; font-size: 0.9em; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+            Este correo ha sido generado automáticamente desde el formulario de contacto de Vaya Panorama.
+          </p>
+        </div>
+      `;
+
+      console.log('Sending email with Resend...');
+      const { data: emailData, error } = await resend.emails.send({
+        from: 'Vaya Panorama <onboarding@resend.dev>',
+        to: import.meta.env.PUBLIC_CONTACT_EMAIL || 'vayapanorama@gmail.com',
+        subject: `Nueva solicitud de presupuesto de ${data.name}`,
+        html: emailContent,
+        reply_to: data.email
+      });
+
+      if (error) {
+        console.error('Error sending email:', error);
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: 'Error al enviar el correo. Por favor, inténtalo de nuevo más tarde.' 
+          }), 
+          { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+
+      // Success response
+      console.log('Email sent successfully:', emailData);
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          message: '¡Solicitud enviada con éxito! Nos pondremos en contacto contigo pronto.'
+        }),
+        { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    
+  } catch (error) {
+    const errorMsg = error instanceof Error ? 
+      `${error.message}\n${error.stack || 'No stack trace'}` : 
+      String(error);
+      
+    console.error('Error processing checkout:', errorMsg);
+    
+    // Log additional error details if available
+    if (error instanceof Error && 'response' in error) {
+      console.error('Error response:', error.response);
+    }
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: 'Error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.',
+        details: process.env.NODE_ENV === 'development' ? errorMsg : undefined
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+  }
+}

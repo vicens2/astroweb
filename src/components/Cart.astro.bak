@@ -1,0 +1,444 @@
+---
+// Import global type declarations
+/// <reference path="../types/globals.d.ts" />
+
+// Define CartItem type for better type safety
+interface CartItem {
+  id: string;
+  title: string;
+  price: string | number;
+  quantity: number;
+  image?: string;
+  category?: string;
+}
+
+// Cart module pattern to encapsulate cart functionality
+const CartModule = (function() {
+  // Private cart data with type annotation
+  let cart: CartItem[] = [];
+
+  // Helper function to check if an object is a valid cart item
+  function isValidCartItem(item: unknown): item is CartItem {
+    if (!item || typeof item !== 'object') return false;
+    const cartItem = item as Record<string, unknown>;
+    return 'id' in cartItem && 'title' in cartItem && 'price' in cartItem;
+  }
+
+  // Helper function to parse price from string or number
+  function parsePrice(price: string | number | null | undefined): number {
+    if (typeof price === 'number') return price;
+    if (!price) return 0;
+
+    // Remove any non-numeric characters except decimal point and comma
+    const cleanPrice = price.toString()
+      .replace(/[^0-9.,]/g, '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+
+    const numericValue = parseFloat(cleanPrice);
+    return isNaN(numericValue) ? 0 : parseFloat(numericValue.toFixed(2));
+  }
+
+  // Public API
+  return {
+    /** @returns {Array<import('../types/globals').CartItem>} */
+    getCart: function() {
+      return [...cart]; // Return a copy to prevent direct mutation
+    },
+
+    /** @param {Array<import('../types/globals').CartItem>} newCart */
+    setCart: function(newCart) {
+      if (Array.isArray(newCart)) {
+        cart = newCart.filter(item => isValidCartItem(item));
+      }
+    },
+
+    // Initialize global functions
+    init: function(): void {
+      if (typeof window === 'undefined') return;
+
+      // Initialize global functions with proper types
+      (window as any).updateQuantity = this.updateQuantity.bind(this);
+      (window as any).removeFromCart = this.removeFromCart.bind(this);
+      (window as any).toggleCart = this.toggleCart.bind(this);
+      (window as any).updateCartUI = this.updateCartUI.bind(this);
+
+      // Load cart from localStorage
+      this.loadCart();
+
+      // Set up event listeners
+      this.setupEventListeners();
+
+      // Initial UI update
+      this.updateCartUI();
+    },
+
+    // Set up event listeners
+    setupEventListeners: function(): void {
+      // Close cart when clicking outside or pressing Escape
+      document.addEventListener('click', (e: MouseEvent) => {
+        const cartPanel = document.getElementById('cart-panel');
+        const cartButton = document.getElementById('cart-button');
+        const target = e.target as Element | null;
+
+        if (cartPanel && target && !cartPanel.contains(target) &&
+          cartButton && !cartButton.contains(target) &&
+          !cartPanel.classList.contains('translate-x-full')) {
+          this.toggleCart(false);
+        }
+      });
+
+      // Close cart with Escape key
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          this.toggleCart(false);
+        }
+      });
+
+      // Cart button click handler
+      const cartButton = document.getElementById('cart-button');
+      if (cartButton) {
+        cartButton.addEventListener('click', () => this.toggleCart());
+      }
+
+      // Close button click handler
+      const closeButton = document.getElementById('close-cart');
+      if (closeButton) {
+        closeButton.addEventListener('click', () => this.toggleCart(false));
+      }
+    },
+
+    // Load cart from localStorage
+    loadCart: function(): void {
+      try {
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart) as CartItem[];
+          if (Array.isArray(parsedCart)) {
+            this.setCart(parsedCart);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cart:', error);
+      }
+    },
+
+    // Save cart to localStorage
+    saveCart: function(): void {
+      try {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        window.dispatchEvent(new Event('cart-updated'));
+      } catch (error) {
+        console.error('Error saving cart:', error);
+      }
+    },
+
+    /**
+     * Update product quantity in cart
+     * @param {string} productId - The ID of the product to update
+     * @param {number} newQuantity - The new quantity
+     */
+    updateQuantity: function(productId: string, newQuantity: number): void {
+      if (newQuantity < 1) {
+        this.removeFromCart(productId);
+        return;
+      }
+
+      const itemIndex = cart.findIndex(item => item && item.id === productId);
+      if (itemIndex !== -1) {
+        const updatedCart = [...cart];
+        updatedCart[itemIndex] = { ...updatedCart[itemIndex], quantity: newQuantity };
+        this.setCart(updatedCart);
+        this.saveCart();
+        this.updateCartUI();
+      }
+    },
+
+    /**
+     * Remove item from cart
+     * @param {string} productId - The ID of the product to remove
+     */
+    removeFromCart: function(productId: string): void {
+      if (!productId) return;
+
+      const newCart = cart.filter(item => item && item.id !== productId);
+      this.setCart(newCart);
+      this.saveCart();
+      this.updateCartUI();
+    },
+
+    /**
+     * Toggle cart visibility
+     * @param {boolean} [show] - Whether to show or hide the cart (optional, toggles if not provided)
+     */
+    toggleCart: function(show?: boolean): void {
+      const cartPanel = document.getElementById('cart-panel');
+      const overlay = document.getElementById('cart-overlay');
+
+      if (!cartPanel || !overlay) return;
+
+      if (show === undefined) {
+        // Toggle if no parameter provided
+        const isHidden = cartPanel.classList.contains('translate-x-full');
+        cartPanel.classList.toggle('translate-x-full');
+        overlay.classList.toggle('hidden');
+        document.body.style.overflow = isHidden ? 'hidden' : '';
+      } else if (show) {
+        // Show cart
+        cartPanel.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } else {
+        // Hide cart
+        cartPanel.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    },
+
+    /**
+     * Update the cart UI with current cart items and totals
+     */
+    updateCartUI: function() {
+      const cartItems = this.getCart();
+      const cartCount = document.getElementById('cart-count');
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartSubtotal = document.getElementById('cart-subtotal');
+      const cartTax = document.getElementById('cart-tax');
+      const cartTotal = document.getElementById('cart-total');
+      const checkoutButton = document.getElementById('checkout-button');
+
+      if (!cartItemsContainer || !cartCount || !cartSubtotal || !cartTax || !cartTotal) return;
+
+      // Update cart count
+      const itemCount = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      cartCount.textContent = itemCount.toString();
+      cartCount.classList.toggle('hidden', itemCount === 0);
+
+      // Clear existing items
+      cartItemsContainer.innerHTML = '';
+
+      // If cart is empty, show empty message and return
+      if (cartItems.length === 0) {
+        cartItemsContainer.innerHTML = `
+          <div class="py-8 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Tu carrito está vacío</h3>
+            <p class="mt-1 text-sm text-gray-500">Empieza a agregar productos a tu carrito</p>
+          </div>
+        `;
+
+        // Update totals to zero
+        cartSubtotal.textContent = '0.00€';
+        cartTax.textContent = '0.00€';
+        cartTotal.textContent = '0.00€';
+
+        // Disable checkout button
+        if (checkoutButton) {
+          checkoutButton.disabled = true;
+        }
+
+        return;
+      }
+
+      // Add items to cart
+      let subtotal = 0;
+
+      cartItems.forEach(item => {
+        if (!item) return;
+
+        const price = parsePrice(item.price);
+        const itemTotal = price * (item.quantity || 1);
+        subtotal += itemTotal;
+
+        const itemElement = document.createElement('div');
+        itemElement.className = 'flex items-center justify-between py-4 border-b';
+        itemElement.innerHTML = `
+          <div class="flex items-center">
+            <img src="${item.image || 'https://via.placeholder.com/64'}"
+                 alt="${item.title || 'Producto'}"
+                 class="w-16 h-16 object-cover rounded">
+            <div class="ml-4">
+              <h4 class="font-medium">${item.title || 'Producto'}</h4>
+              <p class="text-gray-500 text-sm">${item.category || ''}</p>
+              <p class="text-indigo-600 font-medium">${price.toFixed(2)}€</p>
+            </div>
+          </div>
+          <div class="flex items-center">
+            <button onclick="window.updateQuantity('${item.id || ''}', ${(item.quantity || 1) - 1})"
+                    class="text-gray-500 hover:text-indigo-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 12H4" />
+              </svg>
+            </button>
+            <span class="mx-2">${item.quantity || 1}</span>
+            <button onclick="window.updateQuantity('${item.id || ''}', ${(item.quantity || 1) + 1})"
+                    class="text-gray-500 hover:text-indigo-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+            <button onclick="window.removeFromCart('${item.id || ''}')"
+                    class="ml-4 text-red-500 hover:text-red-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+      });
+
+      // Calculate and update totals
+      const tax = subtotal * 0.21; // 21% IVA
+      const total = subtotal + tax;
+
+      cartSubtotal.textContent = `${subtotal.toFixed(2)}€`;
+      cartTax.textContent = `${tax.toFixed(2)}€`;
+      cartTotal.textContent = `${total.toFixed(2)}€`;
+
+      // Enable checkout button if there are items
+      if (checkoutButton) {
+        checkoutButton.disabled = false;
+      }
+    }
+  };
+})();
+
+// Initialize the cart when the component mounts
+if (import.meta.env.SSR === false) {
+  document.addEventListener('astro:page-load', () => {
+    // Initialize the cart module
+    CartModule.init();
+    
+    // Expose CartModule to window for debugging (optional)
+    (window as any).CartModule = CartModule;
+    
+    // Expose necessary functions to window
+    (window as any).getCart = () => CartModule.getCart();
+    (window as any).updateQuantity = (productId, newQuantity) => {
+      CartModule.updateQuantity(productId, newQuantity);
+    };
+    (window as any).removeFromCart = (productId) => {
+      CartModule.removeFromCart(productId);
+    };
+    (window as any).updateCartUI = () => CartModule.updateCartUI();
+    (window as any).toggleCart = (show) => CartModule.toggleCart(show);
+    
+    console.log('Cart: Initialization complete');
+  });
+}
+
+<!-- Main cart component -->
+<div class="fixed bottom-4 right-4 z-50">
+  <!-- Cart button -->
+  <button 
+    id="cart-button" 
+    class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center relative"
+    aria-label="Abrir carrito"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+  </button>
+  
+  <!-- Cart panel -->
+  <div id="cart-panel" class="fixed inset-0 z-40 hidden">
+    <!-- Overlay -->
+    <div id="cart-overlay" class="absolute inset-0 bg-black bg-opacity-50"></div>
+    
+    <!-- Cart content -->
+    <div class="absolute top-0 right-0 h-full w-full sm:w-96 bg-white dark:bg-gray-800 shadow-xl flex flex-col transition-all duration-300 ease-in-out translate-x-full">
+      <!-- Cart header -->
+      <div class="p-4 border-b dark:border-gray-700 flex justify-between items-center">
+        <h2 class="text-xl font-bold dark:text-white">Carrito de compras</h2>
+        <button id="close-cart" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Cart items -->
+      <div id="cart-items" class="flex-1 overflow-y-auto p-4">
+        <p class="text-gray-500 dark:text-gray-400 text-center my-8">Cargando carrito...</p>
+      </div>
+      
+      <!-- Order summary -->
+      <div class="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900">
+        <div class="flex justify-between mb-2 text-gray-700 dark:text-gray-300">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">0.00 €</span>
+        </div>
+        <div class="flex justify-between mb-2 text-gray-700 dark:text-gray-300">
+          <span>IVA (21%):</span>
+          <span id="cart-tax">0.00 €</span>
+        </div>
+        <div class="flex justify-between font-bold text-lg text-gray-900 dark:text-white">
+          <span>Total:</span>
+          <span id="cart-total">0.00 €</span>
+        </div>
+        <button 
+          id="checkout-button"
+          class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg disabled:opacity-50 transition-colors duration-200"
+          disabled
+        >
+          Proceder al pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cart styles -->
+<style is:global>
+  /* Make sure the cart panel has maximum priority */
+  #cart-panel {
+    z-index: 9999 !important;
+  }
+  
+  /* Panel transition styles */
+  #cart-panel > div:last-child {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  #cart-panel:not(.hidden) > div:last-child {
+    transform: translateX(0) !important;
+  }
+  
+  /* Cart counter styles */
+  #cart-count {
+    display: none;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 9999px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #cart-count:not(:empty) {
+    display: flex;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    #cart-panel > div:last-child {
+      background-color: #1f2937;
+    }
+  }
+</style>
+
+<!-- Export the CartModule for use in other components -->
+<script>
+  export const cartModule = CartModule;
+</script>

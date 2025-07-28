@@ -1,0 +1,222 @@
+---
+const { class: className } = Astro.props;
+---
+
+<!-- Popup de notificación -->
+<div id="notificationPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+    <div id="notificationIcon" class="text-4xl mb-4 text-center">
+      <!-- Ícono de éxito (se mostrará por defecto) -->
+      <div class="success-icon hidden">
+        <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <!-- Ícono de error -->
+      <div class="error-icon hidden">
+        <svg class="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </div>
+    </div>
+    <h3 id="notificationTitle" class="text-xl font-bold text-gray-900 mb-2 text-center">¡Éxito!</h3>
+    <p id="notificationMessage" class="text-gray-700 mb-6 text-center">Tu mensaje ha sido enviado correctamente.</p>
+    <button id="closeNotification" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+      Aceptar
+    </button>
+  </div>
+</div>
+
+<div id="contact" class="w-full bg-zinc-900 py-20" style="position: relative; z-index: 10;">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="text-center max-w-4xl mx-auto">
+      <h2 class="text-4xl font-bold text-white mb-4">Contáctanos</h2>
+      <p class="text-lg text-zinc-300 mb-12">
+        ¿Tienes alguna pregunta? Envíanos un mensaje y te responderemos lo antes posible.
+      </p>
+    </div>
+    
+    <div style="max-width: 42rem; margin: 0 auto;">
+      <form id="contactForm">
+        <div style="margin-bottom: 1.5rem;">
+          <label for="fullname" style="display: block; margin-bottom: 0.5rem; color: #e5e7eb;">Nombre completo *</label>
+          <input 
+            type="text" 
+            id="fullname" 
+            name="fullname"
+            required
+            style="width: 100%; padding: 0.75rem; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #374151; border-radius: 0.5rem; color: white;"
+          >
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label for="email" style="display: block; margin-bottom: 0.5rem; color: #e5e7eb;">Email *</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            required
+            style="width: 100%; padding: 0.75rem; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #374151; border-radius: 0.5rem; color: white;"
+          >
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label for="phone" style="display: block; margin-bottom: 0.5rem; color: #e5e7eb;">Teléfono *</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone"
+            required
+            placeholder="+34 123 456 789"
+            style="width: 100%; padding: 0.75rem; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #374151; border-radius: 0.5rem; color: white;"
+          >
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label for="message" style="display: block; margin-bottom: 0.5rem; color: #e5e7eb;">Mensaje *</label>
+          <textarea 
+            id="message" 
+            name="message" 
+            rows="5"
+            required
+            style="width: 100%; padding: 0.75rem; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #374151; border-radius: 0.5rem; color: white;"
+          ></textarea>
+        </div>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 1rem;">
+          <p style="font-size: 0.875rem; color: #9ca3af;">* Campos obligatorios</p>
+          <button 
+            type="submit" 
+            id="submitButton"
+            style="padding: 0.75rem 1.5rem; background-color: #ffffff; color: #1f2937; font-weight: 500; border-radius: 0.5rem; border: none; cursor: pointer;"
+            class="hover:bg-gray-100 transition-colors"
+          >
+            Enviar mensaje
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Función para mostrar notificación
+    function showNotification(isSuccess: boolean, message: string) {
+      const popup = document.getElementById('notificationPopup');
+      const title = document.getElementById('notificationTitle');
+      const notificationMessage = document.getElementById('notificationMessage');
+      const successIcon = document.querySelector('.success-icon');
+      const errorIcon = document.querySelector('.error-icon');
+      
+      if (isSuccess) {
+        title.textContent = '¡Éxito!';
+        successIcon.classList.remove('hidden');
+        errorIcon.classList.add('hidden');
+      } else {
+        title.textContent = 'Error';
+        successIcon.classList.add('hidden');
+        errorIcon.classList.remove('hidden');
+      }
+      
+      notificationMessage.textContent = message;
+      popup.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Cerrar notificación
+    const closeButton = document.getElementById('closeNotification');
+    closeButton?.addEventListener('click', () => {
+      const popup = document.getElementById('notificationPopup');
+      popup.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Cerrar al hacer clic fuera del popup
+    const popup = document.getElementById('notificationPopup');
+    popup?.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Function to disable cursor follower when interacting with form elements
+    function toggleCursorFollower(disable) {
+      const cursor = document.getElementById('cursor-follower');
+      if (cursor) {
+        cursor.style.pointerEvents = disable ? 'none' : 'auto';
+      }
+    }
+
+    // Add event listeners to all form elements
+    document.querySelectorAll('input, textarea, button, select').forEach(element => {
+      element.addEventListener('focus', () => toggleCursorFollower(true));
+      element.addEventListener('blur', () => toggleCursorFollower(false));
+      element.addEventListener('mouseenter', () => toggleCursorFollower(true));
+      element.addEventListener('mouseleave', () => toggleCursorFollower(false));
+    });
+
+    // Handle form submission
+    document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const form = e.target;
+      const submitButton = document.getElementById('submitButton');
+      const originalButtonText = submitButton.textContent;
+      
+      try {
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.textContent = 'Enviando...';
+        submitButton.style.opacity = '0.7';
+        
+        const formData = {
+          name: form.fullname.value.trim(),
+          email: form.email.value.trim(),
+          phone: form.phone.value.trim(),
+          message: form.message.value.trim()
+        };
+        
+        const response = await fetch('/api/contact.json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        let result;
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          console.error('Error parsing JSON response:', jsonError);
+          throw new Error('Error al procesar la respuesta del servidor');
+        }
+        
+        if (!response.ok) {
+          console.error('Server error:', result);
+          throw new Error(result.message || `Error del servidor: ${response.status} ${response.statusText}`);
+        }
+        
+        // Show success message in popup
+        showNotification(true, '¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.');
+        form.reset();
+        
+      } catch (error: unknown) {
+        console.error('Error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Hubo un error al enviar el mensaje. Por favor, inténtalo de nuevo más tarde.';
+        showNotification(false, errorMessage);
+      } finally {
+        // Reset button state
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalButtonText;
+          submitButton.style.opacity = '1';
+        }
+      }
+    });
+    
+    // Mostrar un mensaje en consola cuando el script se cargue correctamente
+    console.log('Contact form script loaded successfully');
+  </script>
+</div>

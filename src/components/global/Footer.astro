@@ -1,0 +1,92 @@
+---
+import { getLangFromUrl, useTranslatedPath, useTranslations } from "@i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-gray-50 py-12">
+  <div class="container mx-auto px-4">
+    <!-- Social Media Icons -->
+    <div class="flex justify-center space-x-8 mb-8">
+      <!-- WhatsApp -->
+      <a href="https://wa.me/34600000000" target="_blank" class="text-gray-600 hover:text-green-500 transition-colors">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M17.5 14.4l-2-1c-.3-.1-.6-.1-.8.1l-1.2 1c-.1.1-.3.1-.5 0-.5-.2-1.3-.9-1.8-1.4-.3-.3-.4-.4-.1-.7l.4-.5c.1-.1.1-.3.1-.5v-1.5c0-.2-.1-.4-.3-.5l-.4-.2h-1.5c-.2 0-.4.1-.5.3-.4.7-.7 1.6-.7 2.4 0 .8.2 1.6.6 2.3.6 1 1.5 1.8 2.6 2.3.8.3 1.7.5 2.6.5 1 0 1.9-.2 2.8-.6.5-.2.7-.8.5-1.2l-.4-.9z"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12c0 2.1.6 4.1 1.7 5.8l-1.1 3.3 3.4-1.1c1.6 1 3.5 1.6 5.5 1.6 6 0 10.8-4.9 10.8-10.8C22.8 6.5 18 2 12 2zm5.2 12.4c-.4.8-1.1 1.4-1.9 1.6-.3.1-.7.1-1.4.2-.4 0-.9.1-2.2-.4-1-.4-2.3-1.2-3.3-2.3-1.2-1.3-2-2.9-2.2-3.7-.1-.4-.1-.7.1-1 .2-.3.5-.5.9-.5h.5c.3 0 .6 0 .8.2.3.2.4.5.6.8.2.3.3.7.5.9.1.2.2.3.3.5.1.2.1.4 0 .6-.1.2-.3.5-.5.7-.2.2-.4.5-.3.8.1.3.5 1.2 1.1 1.9.8.9 1.5 1.2 1.8 1.3.3.1.5.1.7 0 .3-.1.5-.3.8-.5.2-.2.5-.4.8-.6.2-.1.4-.1.6-.1.2 0 .5 0 .7.2.3.2 1 .9 1.1 1.1.2.2.3.5.2.7z"/>
+        </svg>
+      </a>
+      
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/vayapanorama" target="_blank" class="text-gray-600 hover:text-pink-600 transition-colors">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.7 4.92 4.92.06 1.26.07 1.64.07 4.85 0 3.2-.01 3.58-.07 4.85-.15 3.25-1.67 4.77-4.92 4.92-1.26.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.25-.15-4.77-1.7-4.92-4.92C2.16 15.58 2.15 15.2 2.15 12s.01-3.58.07-4.85C2.38 3.9 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zm0-1.6c-3.26 0-3.67.01-4.95.07-4.36.2-6.78 2.62-6.98 6.98C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c4.36-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.2-4.36-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0z"/>
+          <path d="M12 5.84c-3.4 0-6.16 2.76-6.16 6.16 0 3.4 2.76 6.16 6.16 6.16 3.4 0 6.16-2.76 6.16-6.16 0-3.4-2.76-6.16-6.16-6.16zm0 10.16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+          <circle cx="16.5" cy="7.5" r="1.5"/>
+        </svg>
+      </a>
+      
+      <!-- Email -->
+      <a href="mailto:info@vayapanorama.com" class="text-gray-600 hover:text-blue-600 transition-colors">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </a>
+    </div>
+    
+    <!-- Navigation Links -->
+    <div class="flex flex-wrap justify-center gap-6 mb-8">
+      <a href={translatePath("/")} class="text-gray-600 hover:text-gray-900">Inicio</a>
+      <a href={translatePath("/catalog/")} class="text-gray-600 hover:text-gray-900">Servicios</a>
+      <a href={translatePath("/gallery/")} class="text-gray-600 hover:text-gray-900">Galería</a>
+      <a href={translatePath("/about/")} class="text-gray-600 hover:text-gray-900">Sobre Nosotros</a>
+      <a href={translatePath("/contact/")} class="text-gray-600 hover:text-gray-900">Contacto</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div class="text-center text-gray-500 text-sm">
+      © {currentYear} Vaya Panorama. Todos los derechos reservados.
+    </div>
+    
+    <!-- Back to Top Button -->
+    <button
+      id="go-top-button"
+      aria-label="Volver arriba"
+      class="fixed bottom-8 right-8 bg-white p-3 rounded-full shadow-lg text-gray-700 hover:bg-gray-100 transition-colors duration-300"
+      data-cursor-hover
+      data-cursor-parallax>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
+  </div>
+</footer>
+
+<style>
+	footer {
+		@apply relative flex w-full flex-col;
+	}
+</style>
+
+<script>
+	import { gsap } from "gsap";
+	import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+
+	gsap.registerPlugin(ScrollToPlugin);
+
+	function init() {
+		var goTopButton = document.getElementById("go-top-button");
+
+		if (!goTopButton) return;
+
+		goTopButton.addEventListener("click", function () {
+			gsap.to(window, { duration: 0.5, scrollTo: 0 });
+		});
+	}
+
+	document.removeEventListener("DOMContentLoaded", init); // astro:page-load
+	document.addEventListener("DOMContentLoaded", init); // astro:page-load
+</script>
