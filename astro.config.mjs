@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	output: 'static', // Using static output for Netlify
+	output: 'server', // Enable server-side rendering for API support
 
 	server: {
 		port: 3000,

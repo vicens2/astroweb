@@ -1,4 +1,4 @@
-import { g as getCollection } from '../chunks/_astro_content_k-3_lzHx.mjs';
+import { g as getCollection } from '../chunks/_astro_content_V5qA8L8X.mjs';
 import rss from '@astrojs/rss';
 export { renderers } from '../renderers.mjs';
 

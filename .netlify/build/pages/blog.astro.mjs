@@ -1,7 +1,7 @@
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
-import { $ as $$BaseLayout } from '../chunks/BaseLayout_DrzkISKV.mjs';
-import { $ as $$Articles } from '../chunks/Articles_0sdTQE8b.mjs';
+import { $ as $$BaseLayout } from '../chunks/BaseLayout_BqqEIV9L.mjs';
+import { $ as $$Articles } from '../chunks/Articles_iXvf_c1W.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Astro = createAstro("https://mintaka.co");
