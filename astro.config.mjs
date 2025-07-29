@@ -3,26 +3,21 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import vercel from '@astrojs/vercel/serverless';
+import netlify from '@astrojs/netlify/functions';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	// experimental: {
-	// 	session: true
-	// },
-	output: 'server',
+	output: 'server', // o 'static' para un sitio completamente estático
+
 	server: {
 		port: 3000,
 		host: true
 	},
-	// Configuración del adaptador de Vercel
-	adapter: vercel({
-		edgeMiddleware: true,
-		external: [],
-		split: true
-	}),
+
+	adapter: netlify(),
+
 	vite: {
 		resolve: {
 			alias: {
@@ -35,24 +30,28 @@ export default defineConfig({
 			},
 		},
 	},
+
 	site: "https://mintaka.co",
+
 	i18n: {
 		defaultLocale: "en",
 		locales: ["en", "it"],
 	},
+
 	markdown: {
 		drafts: true,
 		shikiConfig: {
 			theme: "css-variables",
 		},
 	},
+
 	shikiConfig: {
 		wrap: true,
 		skipInline: false,
 		drafts: true,
 	},
+
 	integrations: [
-		vercel(),
 		tailwind({
 			applyBaseStyles: false,
 		}),
