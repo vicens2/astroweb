@@ -3,7 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import netlify from '@astrojs/netlify';
+import netlify from '@astrojs/netlify/functions';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -16,7 +16,10 @@ export default defineConfig({
 		host: true
 	},
 
-	adapter: netlify(),
+	adapter: netlify({
+		edgeMiddleware: true,
+		functionPerRoute: false
+	}),
 
 	vite: {
 		resolve: {
