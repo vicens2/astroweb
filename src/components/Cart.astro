@@ -358,6 +358,25 @@
     return cart;
   };
 
+  // Open checkout form function
+  const openCheckoutForm = () => {
+    // Close the cart
+    const cart = window.cartInstance;
+    if (cart) {
+      cart.closeCart();
+    }
+    
+    // Show the checkout form
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+      checkoutForm.classList.remove('hidden');
+      // Scroll to the checkout form
+      checkoutForm.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      console.error('Checkout form element not found');
+    }
+  };
+
   // Show notification function
   const showNotification = (message: string) => {
     const notification = document.createElement('div');
@@ -412,7 +431,16 @@
       
       // Initialize cart when DOM is ready
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeCart);
+        document.addEventListener('DOMContentLoaded', () => {
+          window.cartInstance = createCart();
+          window.cartInstance.init();
+          
+          // Add event listener to the checkout button
+          const checkoutButton = document.getElementById('checkout-button');
+          if (checkoutButton) {
+            checkoutButton.addEventListener('click', openCheckoutForm);
+          }
+        });
       } else {
         // Small delay to ensure all elements are in the DOM
         setTimeout(initializeCart, 100);
@@ -518,7 +546,6 @@
     </div>
       <div class="mt-6">
         <button
-          onclick="openCheckoutForm()"
           id="checkout-button"
           class="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
