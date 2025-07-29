@@ -28,12 +28,34 @@ Mintaka is a template made with [Astro](https://astro.build), [Tailwind](https:/
 
 ![Mintaka Preview](.github/images/majestico_share.gif)
 
-## 🧪 Test
+## 🚀 Despliegue en Vercel
 
-On the folder run
+Puedes desplegar este proyecto en Vercel de dos formas:
 
-1. `bun install`  <small>(or `yarn` or `pnpm i`)</small>
-2. `bun run dev`  <small>(or `yarn dev` or `pnpm dev`)</small>
+### Opción 1: Usar el botón de despliegue
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/majesticooss/mintaka)
+
+### Opción 2: Configuración manual
+
+1. Haz fork de este repositorio
+2. Crea un nuevo proyecto en [Vercel](https://vercel.com/)
+3. Importa tu repositorio
+4. Configura las variables de entorno si es necesario
+5. Haz clic en "Deploy"
+
+## 🧪 Desarrollo local
+
+Para ejecutar el proyecto localmente:
+
+1. `bun install`  <small>(o `yarn` o `pnpm i`)</small>
+2. `bun run dev`  <small>(o `yarn dev` o `pnpm dev`)</small>
+
+Para construir para producción:
+
+```bash
+bun run build
+```
 
 ## ✅ Features
 
