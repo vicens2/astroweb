@@ -1,14 +1,27 @@
 {
-  "version": 3,
+  "version": 2,
   "builds": [
     {
       "src": "dist/server/entry.mjs",
       "use": "@vercel/node"
+    },
+    {
+      "src": "dist/client/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
-    { "src": "/_image", "dest": "/_image" },
-    { "src": "/_astro/.*", "dest": "/_astro/" },
-    { "src": "/.*", "dest": "/" }
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    },
+    {
+      "src": "/_astro/(.*)",
+      "dest": "/_astro/$1"
+    },
+    {
+      "src": "/(.*)\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)",
+      "dest": "/$1.$2"
+    }
   ]
 }
