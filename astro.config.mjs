@@ -17,8 +17,7 @@ export default defineConfig({
 	},
 
 	adapter: netlify({
-		edgeMiddleware: true,
-		functionPerRoute: false
+		// Use minimal configuration first
 	}),
 
 	vite: {
