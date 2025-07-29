@@ -3,7 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -55,6 +55,7 @@ export default defineConfig({
 		drafts: true,
 	},
 	integrations: [
+		vercel(),
 		tailwind({
 			applyBaseStyles: false,
 		}),
