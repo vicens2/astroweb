@@ -3,13 +3,13 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import netlify from '@astrojs/netlify/functions';
+import netlify from '@astrojs/netlify';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	output: 'server', // o 'static' para un sitio completamente estático
+	output: 'static', // Using static output for Netlify
 
 	server: {
 		port: 3000,

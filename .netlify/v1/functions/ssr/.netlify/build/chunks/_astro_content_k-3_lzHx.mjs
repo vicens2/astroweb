@@ -140,7 +140,7 @@ function createGetCollection({
     } else if (collection in dataCollectionToEntryMap) {
       type = "data";
     } else if (store.hasCollection(collection)) {
-      const { default: imageAssetMap } = await import('./content-assets_6pNJrFS9.mjs');
+      const { default: imageAssetMap } = await import('./content-assets_DUKO6PLK.mjs');
       const result = [];
       for (const rawEntry of store.values(collection)) {
         const data = updateImageReferencesInData(rawEntry.data, rawEntry.filePath, imageAssetMap);
@@ -222,7 +222,7 @@ function emulateLegacyEntry({ legacyId, ...entry }) {
 }
 const CONTENT_LAYER_IMAGE_REGEX = /__ASTRO_IMAGE_="([^"]+)"/g;
 async function updateImageReferencesInBody(html, fileName) {
-  const { default: imageAssetMap } = await import('./content-assets_6pNJrFS9.mjs');
+  const { default: imageAssetMap } = await import('./content-assets_DUKO6PLK.mjs');
   const imageObjects = /* @__PURE__ */ new Map();
   const { getImage } = await import('./_astro_assets_FfDA6mQs.mjs');
   for (const [_full, imagePath] of html.matchAll(CONTENT_LAYER_IMAGE_REGEX)) {
@@ -286,7 +286,7 @@ async function renderEntry(entry) {
   }
   if (entry.deferredRender) {
     try {
-      const { default: contentModules } = await import('./content-modules_CI3oRtI-.mjs');
+      const { default: contentModules } = await import('./content-modules_BrzjFsvT.mjs');
       const renderEntryImport = contentModules.get(entry.filePath);
       return render({
         collection: "",

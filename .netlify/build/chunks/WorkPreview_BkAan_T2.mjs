@@ -3,7 +3,7 @@ import 'kleur/colors';
 /* empty css                         */
 import 'clsx';
 import { g as getLangFromUrl, u as useTranslations, a as useTranslatedPath } from './BaseLayout_DrzkISKV.mjs';
-import { g as getCollection } from './_astro_content_BNi-NYdj.mjs';
+import { g as getCollection } from './_astro_content_k-3_lzHx.mjs';
 import { Image as $$Image } from './_astro_assets_FfDA6mQs.mjs';
 
 const $$Astro$4 = createAstro("https://mintaka.co");

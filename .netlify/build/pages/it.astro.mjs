@@ -1,7 +1,7 @@
 import { c as createAstro, a as createComponent, m as maybeRenderHead, e as addAttribute, d as renderScript, b as renderTemplate, r as renderComponent, u as unescapeHTML, F as Fragment } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { g as getLangFromUrl, u as useTranslations, a as useTranslatedPath, $ as $$BaseLayout } from '../chunks/BaseLayout_DrzkISKV.mjs';
-import { $ as $$Hero, a as $$WorkPreview, b as $$Tagline } from '../chunks/WorkPreview_C6eTX97C.mjs';
+import { $ as $$Hero, a as $$WorkPreview, b as $$Tagline } from '../chunks/WorkPreview_BkAan_T2.mjs';
 import 'clsx';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';

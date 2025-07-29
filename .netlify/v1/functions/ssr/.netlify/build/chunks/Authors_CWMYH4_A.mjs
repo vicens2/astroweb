@@ -1,6 +1,6 @@
 import { c as createAstro, a as createComponent, m as maybeRenderHead, r as renderComponent, e as addAttribute, b as renderTemplate } from './astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
-import { g as getCollection } from './_astro_content_BNi-NYdj.mjs';
+import { g as getCollection } from './_astro_content_k-3_lzHx.mjs';
 import { $ as $$Icon } from './Icon_C4rjcPyI.mjs';
 import { $ as $$Title } from './Title_Bcn2RFpG.mjs';
 import { g as getLangFromUrl, a as useTranslatedPath } from './BaseLayout_DrzkISKV.mjs';
