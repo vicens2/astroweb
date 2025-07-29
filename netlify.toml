@@ -6,11 +6,19 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=./"
 
+# Edge Functions configuration
+[functions]
+  # Point to the directory where the Edge Functions are located
+  directory = ".netlify/edge-functions/"
+  # Node.js version for Edge Functions
+  node_bundler = "esbuild"
+
 # Handle client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 # Security headers
 [[headers]]
