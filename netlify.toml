@@ -6,6 +6,7 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=./"
   NODE_OPTIONS = "--experimental-vm-modules"
+  ASTRO_NETLIFY_ADAPTER_MODE = "static"
 
 # Security headers
 [[headers]]
