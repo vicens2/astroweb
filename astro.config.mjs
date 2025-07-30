@@ -10,61 +10,56 @@ import { fileURLToPath } from 'url';
 // https://astro.build/config
 export default defineConfig({
   output: 'server', // Enable server-side rendering for API support
+  adapter: netlify({
+    edgeMiddleware: true,
+    build: {
+      server: './src/pages/api',
+    },
+  }),
 
   server: {
     port: 3000,
     host: true
   },
 
-  adapter: netlify({
-    dist: new URL('./dist/', import.meta.url),
-    builders: true,
-    edgeMiddleware: true,
-  }),
-
-  site: process.env.URL || 'https://mintaka.co',
-  
-  i18n: {
-    defaultLocale: "en",
-    locales: ["en", "it"],
-  },
-
-  markdown: {
-    drafts: true,
-    shikiConfig: {
-      theme: "css-variables",
-    },
-  },
-
-  shikiConfig: {
-    wrap: true,
-    skipInline: false,
-    drafts: true,
-  },
-
   integrations: [
-    tailwind({
-      applyBaseStyles: false,
-    }),
-    sitemap(),
     mdx(),
-    icon(),
+    sitemap(),
+    tailwind({
+      config: {
+        applyBaseStyles: false,
+      },
+    }),
+    icon({
+      include: {
+        'mdi': ['*'],
+      },
+    }),
   ],
 
   vite: {
     resolve: {
       alias: {
-        '~': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src'),
-      },
-    },
-    ssr: {
-      // Ensure Resend and other server-side dependencies are properly bundled
-      external: ['@resend/resend'],
-    },
-    server: {
-      watch: {
-        usePolling: true,
+        '@': path.resolve(fileURLToPath(import.meta.url), 'src'),
       },
     },
   },
+
+  // Build configuration
+  build: {
+    // Ensure static assets are properly handled
+    assets: '_astro',
+  },
+
+  // Enable experimental features if needed
+  experimental: {
+    viewTransitions: true,
+    clientPrerender: true,
+  },
+
+  // Site configuration
+  site: 'https://your-site-url.netlify.app', // Replace with your actual site URL
+  base: '/',
+  trailingSlash: 'always',
+  output: 'server',
 });

@@ -15,12 +15,17 @@
   # Enable Node.js compatibility
   external_node_modules = ["@resend/resend"]
 
-# Handle client-side routing with proper SSR support
+# Handle all routes through the SSR function
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/entry"
   status = 200
-  force = true
+
+# Handle static files
+[[redirects]]
+  from = "/_astro/*"
+  to = "/_astro/:splat"
+  status = 200
 
 # API routes
 [[redirects]]
@@ -28,22 +33,7 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Static assets
-[[redirects]]
-  from = "/_astro/*"
-  to = "/_astro/:splat"
-  status = 200
-  force = true
-
-# Other static files
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/entry"
-  status = 200
-  force = true
-  conditions = {Language = ["en", "es"]}
-
-# Security headers
+# Ensure proper MIME types for assets
 [[headers]]
   for = "/*"
   [headers.values]
@@ -51,4 +41,9 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;"
+
+# Cache static assets
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
