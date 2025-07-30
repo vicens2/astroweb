@@ -1,13 +1,10 @@
-// This file is the entry point for Netlify Functions
-// It handles all incoming requests and renders the appropriate page
-
+// Netlify Function entry point
 import { createRequestHandler } from '@astrojs/netlify/functions';
 import * as _entry from '../dist/entry.mjs';
 
 export const handler = createRequestHandler({
   entrypoint: _entry,
-  // Enable streaming responses for better performance
-  responseMode: 'stream',
+  responseMode: 'buffer', // Changed from 'stream' to 'buffer' for better compatibility
 });
 
 // For development
@@ -55,7 +52,7 @@ if (process.env.NETLIFY_DEV) {
         const mod = await import(serverEntry);
         const handler = createRequestHandler({
           entrypoint: mod,
-          responseMode: 'stream',
+          responseMode: 'buffer', // Changed from 'stream' to 'buffer' for better compatibility
         });
         return await handler(req, res);
       } catch (error) {

@@ -8,14 +8,10 @@
 
 # Serverless Functions configuration
 [functions]
-  # Point to the directory where the serverless functions are located
-  directory = ".netlify/functions-internal/"
-  # Node.js version for serverless functions
   node_bundler = "esbuild"
-  # External Node modules needed for functions
   external_node_modules = ["@resend/resend"]
 
-# Handle static files with higher priority
+# Handle static assets
 [[redirects]]
   from = "/_astro/*"
   to = "/_astro/:splat"
