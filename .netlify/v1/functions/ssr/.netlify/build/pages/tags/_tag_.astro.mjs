@@ -1,7 +1,8 @@
+/* empty css                                       */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
-import { g as getCollection } from '../../chunks/_astro_content_V5qA8L8X.mjs';
-import { $ as $$Tag } from '../../chunks/Tag_C6tCHHTE.mjs';
+import { g as getCollection } from '../../chunks/_astro_content_15nJQAc3.mjs';
+import { $ as $$Tag } from '../../chunks/Tag_DXS4k6PO.mjs';
 import { $ as $$BaseLayout } from '../../chunks/BaseLayout_BqqEIV9L.mjs';
 export { renderers } from '../../renderers.mjs';
 
@@ -40,7 +41,7 @@ const $$tag = createComponent(async ($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/tags/[tag].astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/tags/[tag].astro";
-const $$url = "/tags/[tag]";
+const $$url = "/tags/[tag]/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

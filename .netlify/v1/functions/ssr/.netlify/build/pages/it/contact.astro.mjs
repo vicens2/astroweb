@@ -1,3 +1,4 @@
+/* empty css                                       */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { $ as $$Contact$1 } from '../../chunks/Contact_8UMkMnzO.mjs';
@@ -17,7 +18,7 @@ const $$Contact = createComponent(($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/it/contact.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/it/contact.astro";
-const $$url = "/it/contact";
+const $$url = "/it/contact/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

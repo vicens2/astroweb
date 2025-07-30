@@ -1,7 +1,8 @@
+/* empty css                                    */
 import { c as createAstro, a as createComponent, m as maybeRenderHead, e as addAttribute, d as renderScript, b as renderTemplate, r as renderComponent, u as unescapeHTML, F as Fragment } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { g as getLangFromUrl, u as useTranslations, a as useTranslatedPath, $ as $$BaseLayout } from '../chunks/BaseLayout_BqqEIV9L.mjs';
-import { $ as $$Hero, a as $$WorkPreview, b as $$Tagline } from '../chunks/WorkPreview_CF14N-zd.mjs';
+import { $ as $$Hero, a as $$WorkPreview, b as $$Tagline } from '../chunks/WorkPreview_CcJ1fQQ7.mjs';
 import 'clsx';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';
@@ -121,7 +122,7 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/it/index.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/it/index.astro";
-const $$url = "/it";
+const $$url = "/it/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

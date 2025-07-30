@@ -12,28 +12,31 @@
   directory = ".netlify/functions-internal/"
   # Node.js version for serverless functions
   node_bundler = "esbuild"
-  # Enable Node.js compatibility
+  # External Node modules needed for functions
   external_node_modules = ["@resend/resend"]
 
-# Handle all routes through the SSR function
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/entry"
-  status = 200
-
-# Handle static files
+# Handle static files with higher priority
 [[redirects]]
   from = "/_astro/*"
   to = "/_astro/:splat"
   status = 200
+  force = true
 
 # API routes
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+  force = true
 
-# Ensure proper MIME types for assets
+# Handle all other routes through the SSR function
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/entry"
+  status = 200
+  force = true
+
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]

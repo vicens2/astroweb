@@ -24,7 +24,7 @@ const post = async ({ request }) => {
         { status: 400 }
       );
     }
-    const resend = new Resend(undefined                              );
+    const resend = new Resend("re_LN8wSRJH_6pxa6T4CigMdF7DXwWDjUfZ4");
     const data = await resend.emails.send({
       from: "Formulario de Contacto <onboarding@resend.dev>",
       to: "flashmephotocall@gmail.com",

@@ -1,7 +1,8 @@
+/* empty css                                    */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
-import { g as getCollection } from '../chunks/_astro_content_V5qA8L8X.mjs';
-import { $ as $$Authors } from '../chunks/Authors_CUBsJIUb.mjs';
+import { g as getCollection } from '../chunks/_astro_content_15nJQAc3.mjs';
+import { $ as $$Authors } from '../chunks/Authors_BYm-vd2b.mjs';
 import { $ as $$BaseLayout } from '../chunks/BaseLayout_BqqEIV9L.mjs';
 export { renderers } from '../renderers.mjs';
 
@@ -19,7 +20,7 @@ const $$Index = createComponent(async ($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/author/index.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/author/index.astro";
-const $$url = "/author";
+const $$url = "/author/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

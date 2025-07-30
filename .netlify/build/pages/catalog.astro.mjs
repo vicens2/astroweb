@@ -1,3 +1,4 @@
+/* empty css                                    */
 import { c as createAstro, a as createComponent, r as renderComponent, d as renderScript, b as renderTemplate, m as maybeRenderHead, e as addAttribute } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { g as getLangFromUrl, $ as $$BaseLayout, u as useTranslations } from '../chunks/BaseLayout_BqqEIV9L.mjs';
@@ -168,7 +169,7 @@ Añadir al carrito
 }, "C:/Users/vicens.juan/astroweb/src/pages/catalog/index.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/catalog/index.astro";
-const $$url = "/catalog";
+const $$url = "/catalog/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,

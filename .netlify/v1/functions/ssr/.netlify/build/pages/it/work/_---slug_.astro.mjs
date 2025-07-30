@@ -1,7 +1,8 @@
+/* empty css                                          */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../../../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
-import { g as getCollection } from '../../../chunks/_astro_content_V5qA8L8X.mjs';
-import { $ as $$MarkdownPostLayout } from '../../../chunks/MarkdownPostLayout_CaHA7W2t.mjs';
+import { g as getCollection } from '../../../chunks/_astro_content_15nJQAc3.mjs';
+import { $ as $$MarkdownPostLayout } from '../../../chunks/MarkdownPostLayout_BhxNzzKK.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const $$Astro = createAstro("https://mintaka.co");
@@ -55,7 +56,7 @@ const $$ = createComponent(async ($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/it/work/[...slug].astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/it/work/[...slug].astro";
-const $$url = "/it/work/[...slug]";
+const $$url = "/it/work/[...slug]/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

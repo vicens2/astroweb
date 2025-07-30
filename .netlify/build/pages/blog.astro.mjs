@@ -1,7 +1,8 @@
+/* empty css                                    */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { $ as $$BaseLayout } from '../chunks/BaseLayout_BqqEIV9L.mjs';
-import { $ as $$Articles } from '../chunks/Articles_iXvf_c1W.mjs';
+import { $ as $$Articles } from '../chunks/Articles_Bt96B7Yr.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Astro = createAstro("https://mintaka.co");
@@ -46,7 +47,7 @@ const $$Index = createComponent(async ($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/blog/index.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/blog/index.astro";
-const $$url = "/blog";
+const $$url = "/blog/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,

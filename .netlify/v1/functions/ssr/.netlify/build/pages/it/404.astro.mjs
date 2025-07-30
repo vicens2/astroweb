@@ -1,3 +1,4 @@
+/* empty css                                       */
 import { c as createAstro, a as createComponent, r as renderComponent, b as renderTemplate } from '../../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { $ as $$Error404 } from '../../chunks/Error404_BNL0MGDx.mjs';
@@ -17,7 +18,7 @@ const $$404 = createComponent(($$result, $$props, $$slots) => {
 }, "C:/Users/vicens.juan/astroweb/src/pages/it/404.astro", void 0);
 
 const $$file = "C:/Users/vicens.juan/astroweb/src/pages/it/404.astro";
-const $$url = "/it/404";
+const $$url = "/it/404/";
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 	__proto__: null,
