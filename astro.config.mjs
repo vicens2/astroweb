@@ -3,60 +3,68 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import netlify from '@astrojs/netlify/edge-functions';
+import netlify from '@astrojs/netlify/functions';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
-	output: 'server', // Enable server-side rendering for API support
+  output: 'server', // Enable server-side rendering for API support
 
-	server: {
-		port: 3000,
-		host: true
-	},
+  server: {
+    port: 3000,
+    host: true
+  },
 
-	adapter: netlify(),
+  adapter: netlify({
+    dist: new URL('./dist/', import.meta.url),
+    builders: true,
+    edgeMiddleware: true,
+  }),
 
-	vite: {
-		resolve: {
-			alias: {
-				'site': path.resolve('./src/site.ts'),
-			},
-		},
-		server: {
-			watch: {
-				usePolling: true,
-			},
-		},
-	},
+  site: process.env.URL || 'https://mintaka.co',
+  
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "it"],
+  },
 
-	site: "https://mintaka.co",
+  markdown: {
+    drafts: true,
+    shikiConfig: {
+      theme: "css-variables",
+    },
+  },
 
-	i18n: {
-		defaultLocale: "en",
-		locales: ["en", "it"],
-	},
+  shikiConfig: {
+    wrap: true,
+    skipInline: false,
+    drafts: true,
+  },
 
-	markdown: {
-		drafts: true,
-		shikiConfig: {
-			theme: "css-variables",
-		},
-	},
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+    }),
+    sitemap(),
+    mdx(),
+    icon(),
+  ],
 
-	shikiConfig: {
-		wrap: true,
-		skipInline: false,
-		drafts: true,
-	},
-
-	integrations: [
-		tailwind({
-			applyBaseStyles: false,
-		}),
-		sitemap(),
-		mdx(),
-		icon(),
-	],
+  vite: {
+    resolve: {
+      alias: {
+        '~': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src'),
+      },
+    },
+    ssr: {
+      // Ensure Resend and other server-side dependencies are properly bundled
+      external: ['@resend/resend'],
+    },
+    server: {
+      watch: {
+        usePolling: true,
+      },
+    },
+  },
 });

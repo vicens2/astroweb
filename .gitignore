@@ -43,3 +43,5 @@ coverage/
 
 # Unlighthouse
 .unlighthouse/
+
+.env

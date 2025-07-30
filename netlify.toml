@@ -6,19 +6,42 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=./"
 
-# Edge Functions configuration
+# Serverless Functions configuration
 [functions]
-  # Point to the directory where the Edge Functions are located
-  directory = ".netlify/edge-functions/"
-  # Node.js version for Edge Functions
+  # Point to the directory where the serverless functions are located
+  directory = ".netlify/functions-internal/"
+  # Node.js version for serverless functions
   node_bundler = "esbuild"
+  # Enable Node.js compatibility
+  external_node_modules = ["@resend/resend"]
 
-# Handle client-side routing
+# Handle client-side routing with proper SSR support
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/.netlify/functions/entry"
   status = 200
-  force = false
+  force = true
+
+# API routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Static assets
+[[redirects]]
+  from = "/_astro/*"
+  to = "/_astro/:splat"
+  status = 200
+  force = true
+
+# Other static files
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/entry"
+  status = 200
+  force = true
+  conditions = {Language = ["en", "es"]}
 
 # Security headers
 [[headers]]
@@ -28,16 +51,4 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
-    
-# Cache static assets for 1 year
-[[headers]]
-  for = "/_astro/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Cache other assets for 1 hour
-[[headers]]
-  for = "/*.(js|css|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|eot)"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;"
