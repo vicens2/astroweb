@@ -40,7 +40,7 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        '@': path.resolve(fileURLToPath(import.meta.url), 'src'),
+        '@': path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src'),
       },
     },
   },
