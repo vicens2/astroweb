@@ -43,6 +43,17 @@ export default defineConfig({
         '@': path.resolve(__dirname, './src'),
       },
     },
+    optimizeDeps: {
+      include: ['@astrojs/mdx', '@astrojs/markdown-remark'],
+      exclude: ['@resend/resend']
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+        },
+      },
+    },
   },
 
   // Site configuration
