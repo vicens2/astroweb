@@ -6,32 +6,6 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=./"
 
-# Serverless Functions configuration
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["@resend/resend"]
-
-# Handle static assets
-[[redirects]]
-  from = "/_astro/*"
-  to = "/_astro/:splat"
-  status = 200
-  force = true
-
-# API routes
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-
-# Handle all other routes through the SSR function
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/entry"
-  status = 200
-  force = true
-
 # Security headers
 [[headers]]
   for = "/*"
