@@ -6,6 +6,10 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefix=./"
 
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@resend/resend"]
+
 # Security headers
 [[headers]]
   for = "/*"
@@ -20,3 +24,9 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Handle SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

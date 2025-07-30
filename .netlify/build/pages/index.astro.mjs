@@ -2,7 +2,7 @@
 import { c as createAstro, a as createComponent, m as maybeRenderHead, d as renderScript, e as addAttribute, b as renderTemplate, r as renderComponent } from '../chunks/astro/server_Ca8J_k7k.mjs';
 import 'kleur/colors';
 import { g as getLangFromUrl, u as useTranslations, a as useTranslatedPath, $ as $$BaseLayout } from '../chunks/BaseLayout_BqqEIV9L.mjs';
-import { $ as $$Hero, b as $$Tagline, a as $$WorkPreview } from '../chunks/WorkPreview_C7WsPnLN.mjs';
+import { $ as $$Hero, b as $$Tagline, a as $$WorkPreview } from '../chunks/WorkPreview_BZHhr2MD.mjs';
 import 'clsx';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';

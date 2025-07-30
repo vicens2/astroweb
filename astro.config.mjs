@@ -3,7 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
-import netlify from '@astrojs/netlify';
+import netlify from '@astrojs/netlify/functions';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -13,8 +13,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   output: 'server',
   adapter: netlify({
-    edgeMiddleware: true,
-    functionPerRoute: false,
+    dist: new URL('dist/', import.meta.url),
+    builders: false,
   }),
 
   server: {
