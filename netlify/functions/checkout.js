@@ -64,24 +64,37 @@ exports.handler = async (event, context) => {
     const subject = `Nueva solicitud de reserva - ${name}`;
     
     const emailContent = `
-      <h2>Nueva solicitud de reserva</h2>
-      <h3>Información del cliente:</h3>
-      <p><strong>Nombre:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Teléfono:</strong> ${phone}</p>
-      
-      <h3>Detalles del evento:</h3>
-      <p><strong>Fecha:</strong> ${eventDate}</p>
-      <p><strong>Hora de inicio:</strong> ${startTime}</p>
-      <p><strong>Ubicación:</strong> ${location}</p>
-      ${notes ? `<p><strong>Notas adicionales:</strong> ${notes}</p>` : ''}
-      
-      <h3>Artículos seleccionados:</h3>
-      ${cartItemsHtml}
-      
-      <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
-        Este es un mensaje automático. Por favor, no responda a este correo.
-      </p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+        <h2 style="color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Nueva solicitud de reserva</h2>
+        
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+          <h3 style="color: #2d3748; margin-top: 0;">Información del cliente:</h3>
+          <p style="margin: 5px 0;"><strong>Nombre:</strong> ${name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 5px 0 15px 0;"><strong>Teléfono:</strong> ${phone}</p>
+          
+          <h3 style="color: #2d3748; margin: 20px 0 10px 0;">Detalles del evento:</h3>
+          <p style="margin: 5px 0;"><strong>Fecha:</strong> ${eventDate}</p>
+          <p style="margin: 5px 0 15px 0;"><strong>Hora de inicio:</strong> ${startTime}</p>
+          <p style="margin: 5px 0 5px 0;"><strong>Ubicación:</strong> ${location}</p>
+          
+          ${notes ? `
+            <div style="margin: 15px 0 15px 0; background: white; padding: 10px; border-radius: 4px; border-left: 4px solid #4299e1;">
+              <p style="margin: 0 0 5px 0; font-weight: bold;">Notas adicionales:</p>
+              <div style="white-space: pre-wrap; word-wrap: break-word; line-height: 1.5;">${notes.replace(/\n/g, '<br>')}</div>
+            </div>
+          ` : ''}
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <h3 style="color: #2d3748; margin-bottom: 10px;">Artículos seleccionados:</h3>
+          ${cartItemsHtml}
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 0.9em; color: #718096; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+          Este es un mensaje automático. Por favor, no responda a este correo.
+        </p>
+      </div>
     `;
 
     console.log('Attempting to send checkout email...');
