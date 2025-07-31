@@ -1,7 +1,16 @@
 const { Resend } = require('resend');
 
 // Initialize Resend with API key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY || process.env.RESEND_API_KEY_DEV;
+
+if (!resendApiKey) {
+  console.error('ERROR: RESEND_API_KEY is not set in environment variables');
+}
+
+const resend = new Resend(resendApiKey);
+
+// Log function start
+console.log('Contact function initialized');
 
 exports.handler = async (event, context) => {
   // Only allow POST requests
@@ -36,8 +45,8 @@ exports.handler = async (event, context) => {
     }
 
     // Email configuration
-    const from = 'Tu Nombre <onboarding@resend.dev>'; // Update with your verified sender email
-    const to = 'tu-email@ejemplo.com'; // Update with your email
+    const from = 'onboarding@resend.dev'; // Must be a verified domain in Resend
+    const to = 'flashmephotocall@gmail.com'; // Your email
     const subject = `Nuevo mensaje de contacto de ${name}`;
     
     const emailContent = `
@@ -49,7 +58,11 @@ exports.handler = async (event, context) => {
       <p>${message}</p>
     `;
 
-    // Send email using Resend
+    console.log('Attempting to send email...');
+    console.log('From:', from);
+    console.log('To:', to);
+    console.log('Subject:', subject);
+    
     const { data, error } = await resend.emails.send({
       from,
       to,
@@ -58,9 +71,11 @@ exports.handler = async (event, context) => {
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Error al enviar el correo electrónico');
+      console.error('Resend API Error:', error);
+      throw new Error(`Error al enviar el correo: ${error.message}`);
     }
+
+    console.log('Email sent successfully:', data);
 
     // Return success response
     return {
@@ -76,6 +91,13 @@ exports.handler = async (event, context) => {
 
   } catch (error) {
     console.error('Error processing form:', error);
+    
+    // Log the full error for debugging
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+    }
     
     return {
       statusCode: 500,
