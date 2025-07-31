@@ -52,6 +52,7 @@ exports.handler = async (event, context) => {
             <p><strong>${item.name}</strong></p>
             <p>Cantidad: ${item.quantity || 1}</p>
             <p>Precio: ${item.price ? `${item.price}€` : 'Consultar'}</p>
+            ${item.hours ? `<p>Horas de contratación: ${item.hours}</p>` : ''}
             ${item.customization ? `<p>Personalización: ${JSON.stringify(item.customization, null, 2)}</p>` : ''}
           </div>
         `).join('')
