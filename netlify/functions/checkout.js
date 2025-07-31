@@ -29,10 +29,10 @@ exports.handler = async (event, context) => {
   try {
     // Parse the form data
     const formData = JSON.parse(event.body);
-    const { name, email, phone, eventDate, timeSlot, startTime, location, notes, cartItems } = formData;
+    const { name, email, phone, eventDate, startTime, location, notes, cartItems } = formData;
 
     // Basic validation
-    if (!name || !email || !phone || !eventDate || !timeSlot || !startTime || !location) {
+    if (!name || !email || !phone || !eventDate || !startTime || !location) {
       return {
         statusCode: 400,
         body: JSON.stringify({ 
@@ -72,7 +72,6 @@ exports.handler = async (event, context) => {
       
       <h3>Detalles del evento:</h3>
       <p><strong>Fecha:</strong> ${eventDate}</p>
-      <p><strong>Franja horaria:</strong> ${timeSlot}</p>
       <p><strong>Hora de inicio:</strong> ${startTime}</p>
       <p><strong>Ubicación:</strong> ${location}</p>
       ${notes ? `<p><strong>Notas adicionales:</strong> ${notes}</p>` : ''}
