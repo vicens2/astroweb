@@ -19,12 +19,15 @@ const config = {
 
   // Configuración para asegurar que los estilos se generen correctamente
   build: {
-    css: 'auto',
-    inlineStylesheets: 'auto',
+    format: 'file',
+    inlineStylesheets: 'always',  // Force inline styles
+    assets: '_assets',
+    cssCodeSplit: false,
     sourcemap: true,
     minify: true,
   },
 
+  // Configuración del servidor
   server: {
     port: 3000,
     host: true,
@@ -33,7 +36,7 @@ const config = {
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com",
-        "style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com",
+        "style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://rsms.me https://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
         "font-src 'self' https: data:",
         "connect-src 'self' https://rsms.me https://fonts.googleapis.com https://fonts.gstatic.com",
@@ -43,6 +46,7 @@ const config = {
     },
   },
 
+  // Integraciones
   integrations: [
     mdx(),
     sitemap(),
@@ -58,6 +62,7 @@ const config = {
     }),
   ],
 
+  // Configuración de Vite
   vite: {
     appType: 'spa',
     resolve: {
@@ -65,45 +70,24 @@ const config = {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    optimizeDeps: {
-      include: [
-        '@astrojs/mdx',
-        '@astrojs/markdown-remark',
-        'alpinejs',
-        'gsap',
-      ],
-      exclude: ['@resend/resend']
-    },
     build: {
-      minify: 'terser',
-      sourcemap: true,
+      assetsInlineLimit: 0,  // Force all assets to be emitted as files
       rollupOptions: {
         output: {
-          manualChunks: undefined,
-          entryFileNames: 'assets/entry.[hash].js',
-          chunkFileNames: 'assets/chunk.[hash].js',
-          assetFileNames: (assetInfo) => {
-            const info = assetInfo.name.split('.');
-            const ext = info[info.length - 1];
-            if (ext === 'css') return `assets/style.[hash].${ext}`;
-            if (ext === 'js') return `assets/script.[hash].${ext}`;
-            return `assets/asset.[hash].${ext}`;
-          },
-        },
-      },
-      assetsInlineLimit: 0,
+          assetFileNames: 'assets/[name].[hash][extname]',
+          chunkFileNames: 'assets/[name].[hash].js',
+          entryFileNames: 'assets/[name].[hash].js',
+        }
+      }
     },
     server: {
       fs: {
-        strict: false,
-      },
-      headers: {
-        'Cross-Origin-Embedder-Policy': 'require-corp',
-        'Cross-Origin-Opener-Policy': 'same-origin',
-      },
-    },
+        strict: false
+      }
+    }
   },
 
+  // Configuración del sitio
   site: 'https://mintaka.co',
   base: '/',
 };
