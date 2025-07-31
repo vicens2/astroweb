@@ -17,6 +17,14 @@ const config = {
     functionPerRoute: false,
   }),
 
+  // Configuración para asegurar que los estilos se generen correctamente
+  build: {
+    css: 'auto',
+    inlineStylesheets: 'auto',
+    sourcemap: true,
+    minify: true,
+  },
+
   server: {
     port: 3000,
     host: true,
@@ -27,7 +35,7 @@ const config = {
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com",
         "style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com",
         "img-src 'self' data: https: blob:",
-        "font-src 'self' https://rsms.me https://fonts.gstatic.com",
+        "font-src 'self' https: data:",
         "connect-src 'self' https://rsms.me https://fonts.googleapis.com https://fonts.gstatic.com",
         "worker-src 'self' blob:",
         "frame-src 'self'"
@@ -98,12 +106,6 @@ const config = {
 
   site: 'https://mintaka.co',
   base: '/',
-  
-  build: {
-    sourcemap: true,
-    minify: true,
-    inlineStylesheets: 'auto',
-  },
 };
 
 export default defineConfig(config);
