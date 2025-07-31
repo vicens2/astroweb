@@ -1,5 +1,6 @@
 ---
-// CheckoutForm component will be added back after debugging
+// Import CheckoutModal component
+import CheckoutModal from './temp_component/CheckoutModal.astro';
 ---
 
 <!-- Debug message -->
@@ -8,6 +9,12 @@
 </div>
 
 <script>
+  // Extend the Window interface to include cartInstance
+  interface Window {
+    cartInstance?: any;
+    showNotification?: (message: string) => void;
+  }
+
   // Define customization interface for album items
   interface AlbumCustomization {
     color: string;
@@ -360,23 +367,35 @@
 
   // Open checkout form function
   const openCheckoutForm = () => {
-    // Close the cart
-    const cart = window.cartInstance;
-    if (cart) {
-      cart.closeCart();
+    console.log('openCheckoutForm called');
+    
+    // Close the cart if it's open
+    if (window.cartInstance) {
+      console.log('Closing cart');
+      window.cartInstance.closeCart();
     }
     
     // Show the checkout modal
     const checkoutModal = document.getElementById('checkout-modal');
+    console.log('Checkout modal element:', checkoutModal);
+    
     if (checkoutModal) {
+      console.log('Removing hidden class from modal');
       checkoutModal.classList.remove('hidden');
-      // Focus the first input for better UX
-      const firstInput = checkoutModal.querySelector('input, select, textarea');
-      if (firstInput) {
-        setTimeout(() => firstInput.focus(), 100);
-      }
+      
+      // Add a small delay to ensure the modal is visible before focusing
+      setTimeout(() => {
+        // Focus the first input for better UX
+        const firstInput = checkoutModal.querySelector('input, select, textarea') as HTMLInputElement | null;
+        console.log('First input element:', firstInput);
+        
+        if (firstInput) {
+          firstInput.focus();
+          console.log('Focused first input:', firstInput);
+        }
+      }, 100);
     } else {
-      console.error('Checkout modal element not found');
+      console.error('Checkout modal element not found in the DOM');
     }
   };
 
@@ -433,24 +452,39 @@
       };
       
       // Initialize cart when DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          window.cartInstance = createCart();
-          window.cartInstance.init();
-          
-          // Add event listener to the checkout button
-          const checkoutButton = document.getElementById('checkout-button');
-          if (checkoutButton) {
-            checkoutButton.addEventListener('click', openCheckoutForm);
+      const initializeWithCheckoutButton = () => {
+        window.cartInstance = cart;
+        cart.init();
+        
+        // Add event listener to the checkout button
+        const checkoutButton = document.getElementById('checkout-button');
+        if (checkoutButton) {
+          // Remove any existing event listeners to prevent duplicates
+          checkoutButton.replaceWith(checkoutButton.cloneNode(true));
+          const newCheckoutButton = document.getElementById('checkout-button');
+          if (newCheckoutButton) {
+            newCheckoutButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              openCheckoutForm();
+            });
           }
-        });
+        } else {
+          console.error('Checkout button not found');
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeWithCheckoutButton);
       } else {
         // Small delay to ensure all elements are in the DOM
-        setTimeout(initializeCart, 100);
+        setTimeout(initializeWithCheckoutButton, 100);
       }
     }
   }
 </script>
+
+<!-- Include the CheckoutModal component -->
+<CheckoutModal client:load />
 
 <!-- Botón del carrito -->
 <div class="fixed bottom-4 right-4 z-50">
