@@ -369,10 +369,10 @@ import CheckoutModal from './temp_component/CheckoutModal.astro';
   const openCheckoutForm = () => {
     console.log('openCheckoutForm called');
     
-    // Close the cart if it's open
+    // Close the cart if it's open using the correct method
     if (window.cartInstance) {
       console.log('Closing cart');
-      window.cartInstance.closeCart();
+      window.cartInstance.toggleCart(false);  // Using toggleCart(false) to close the cart
     }
     
     // Show the checkout modal
