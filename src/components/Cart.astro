@@ -366,14 +366,17 @@
       cart.closeCart();
     }
     
-    // Show the checkout form
-    const checkoutForm = document.getElementById('checkout-form');
-    if (checkoutForm) {
-      checkoutForm.classList.remove('hidden');
-      // Scroll to the checkout form
-      checkoutForm.scrollIntoView({ behavior: 'smooth' });
+    // Show the checkout modal
+    const checkoutModal = document.getElementById('checkout-modal');
+    if (checkoutModal) {
+      checkoutModal.classList.remove('hidden');
+      // Focus the first input for better UX
+      const firstInput = checkoutModal.querySelector('input, select, textarea');
+      if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+      }
     } else {
-      console.error('Checkout form element not found');
+      console.error('Checkout modal element not found');
     }
   };
 
