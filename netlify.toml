@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
   
 [build.environment]
   NODE_VERSION = "20"
@@ -29,25 +30,20 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = """
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://www.unpkg.com;
-      script-src-elem 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://www.unpkg.com;
-      style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com;
-      style-src-elem 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com;
-      img-src 'self' data: https: blob:;
-      font-src 'self' https: data:;
-      connect-src 'self' https://rsms.me https://fonts.googleapis.com https://fonts.gstatic.com https://www.unpkg.com;
-      worker-src 'self' blob:;
-      frame-src 'self';
-      child-src 'self' blob:;
-    """
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com; script-src-elem 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://rsms.me https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://rsms.me https://fonts.googleapis.com https://fonts.gstatic.com https://www.unpkg.com https://api.resend.com; worker-src 'self' blob:; frame-src 'self'; child-src 'self' blob:;"
 
 # Redirecciones para SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Redirección para el formulario de contacto
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact"
+  status = 200
+  force = true
 
 # Configuración de encabezados para archivos específicos
 [[headers]]
@@ -59,3 +55,8 @@
   for = "/*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Configuración de funciones
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["resend"]

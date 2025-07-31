@@ -176,7 +176,8 @@ const { class: className } = Astro.props;
           message: form.message.value.trim()
         };
         
-        const response = await fetch('/api/contact.json', {
+        // Update the endpoint to use the Netlify function
+        const response = await fetch('/.netlify/functions/contact', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
