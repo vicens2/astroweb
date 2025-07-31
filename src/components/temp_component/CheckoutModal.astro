@@ -202,6 +202,85 @@
     const form = document.getElementById('checkout-form') as HTMLFormElement;
     if (!form) return;
     
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalButtonText = submitButton?.textContent || 'Enviar solicitud';
+      const formMessage = document.getElementById('form-message') as HTMLElement;
+      
+      try {
+        // Show loading state
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Enviando...';
+          submitButton.style.opacity = '0.7';
+        }
+        
+        // Get form data
+        const formData = new FormData(form);
+        const formValues = Object.fromEntries(formData.entries());
+        
+        // Get cart items from localStorage
+        let cartItems = [];
+        try {
+          const savedCart = localStorage.getItem('cart');
+          if (savedCart) {
+            cartItems = JSON.parse(savedCart);
+          }
+        } catch (error) {
+          console.error('Error loading cart items:', error);
+        }
+        
+        // Add cart items to form data
+        const requestData = {
+          ...formValues,
+          cartItems
+        };
+        
+        // Send data to Netlify function
+        const response = await fetch('/.netlify/functions/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.message || 'Error al enviar la solicitud');
+        }
+        
+        // Show success message
+        showCheckoutNotification(true, result.message || '¡Solicitud enviada con éxito! Nos pondremos en contacto contigo pronto.');
+        
+        // Reset form and close modal
+        form.reset();
+        closeCheckoutModal();
+        
+        // Clear cart
+        localStorage.removeItem('cart');
+        
+        // Update cart UI if available
+        if (window.cart) {
+          window.cart.updateUI();
+        }
+        
+      } catch (error: any) {
+        console.error('Error submitting form:', error);
+        showCheckoutNotification(false, error?.message || 'Hubo un error al enviar tu solicitud. Por favor, inténtalo de nuevo.');
+      } finally {
+        // Reset button state
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalButtonText;
+          submitButton.style.opacity = '1';
+        }
+      }
+    });
+    
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
