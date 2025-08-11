@@ -63,6 +63,7 @@ export const POST: APIRoute = async ({ request }) => {
     interface CartItem {
       name: string;
       price: string | number;
+      hours?: number;
       customization?: {
         color?: string;
         text?: string;
@@ -127,10 +128,11 @@ export const POST: APIRoute = async ({ request }) => {
     // Calculate total hours for each service type
     const serviceHours: Record<string, number> = {};
     (data.cart as CartItem[]).forEach((item: CartItem) => {
+      const hours = parseInt(String(item.hours || 0), 10);
       if (item.name.toLowerCase().includes('fotomatón') || item.name.toLowerCase().includes('fotomaton')) {
-        serviceHours['fotomatones'] = (serviceHours['fotomatones'] || 0) + (parseInt(item.hours) || 0);
+        serviceHours['fotomatones'] = (serviceHours['fotomatones'] || 0) + hours;
       } else if (item.name.toLowerCase().includes('360') || item.name.toLowerCase().includes('plataforma')) {
-        serviceHours['plataformas360'] = (serviceHours['plataformas360'] || 0) + (parseInt(item.hours) || 0);
+        serviceHours['plataformas360'] = (serviceHours['plataformas360'] || 0) + hours;
       }
     });
 
